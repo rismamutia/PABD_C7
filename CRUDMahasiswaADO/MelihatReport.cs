@@ -14,7 +14,7 @@ namespace CRUDMahasiswaADO
 {
     public partial class MelihatReport : Form
     {
-        private readonly string connectionString = "Data Source=.;Initial Catalog=DBJadwalKoordinasi;Integrated Security=True";
+        private readonly string connectionString = "Data Source=LAPTOP-49331NDM\\RIANIINDRI;Initial Catalog=DBJadwalKoor;Integrated Security=True";
 
         private readonly SqlConnection conn;
 
@@ -37,9 +37,19 @@ namespace CRUDMahasiswaADO
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridView1.RowHeadersVisible = false;
-            dataGridView1.BackgroundColor = System.Drawing.Color.White;
-            dataGridView1.AlternatingRowsDefaultCellStyle.BackColor =
-            System.Drawing.Color.AliceBlue;
+            dataGridView1.BackgroundColor = Color.White;
+            dataGridView1.BorderStyle = BorderStyle.FixedSingle;
+            dataGridView1.AlternatingRowsDefaultCellStyle.BackColor = Color.AliceBlue;
+
+            // Header style
+            dataGridView1.ColumnHeadersDefaultCellStyle.BackColor = Color.SteelBlue;
+            dataGridView1.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
+            dataGridView1.ColumnHeadersDefaultCellStyle.Font =
+                new Font("Segoe UI", 9f, FontStyle.Bold);
+            dataGridView1.EnableHeadersVisualStyles = false;
+
+            // Row height
+            dataGridView1.RowTemplate.Height = 24;
         }
 
         private void LoadReport(string keyword = "")
@@ -51,26 +61,22 @@ namespace CRUDMahasiswaADO
                     conn.Open();
 
                     string query = @"
-                SELECT
-                    p.PertemuanID  AS [ID],
-                    m.NIM          AS [NIM],
-                    m.Nama         AS [Nama Mahasiswa],
-                    d.Nama         AS [Nama Dosen],
-                    j.Tanggal      AS [Tanggal],
-                    j.WaktuMulai   AS [Jam Mulai],
-                    j.WaktuSelesai AS [Jam Selesai],
-                    p.Status       AS [Status],
-                    p.CatatanPermintaan AS [Catatan]
-                FROM Pertemuan p
-                JOIN Mahasiswa   m ON p.MahasiswaID = m.MahasiswaID
-                JOIN JadwalDosen j ON p.JadwalID    = j.JadwalID
-                JOIN Dosen       d ON j.DosenID     = d.DosenID
-                WHERE
-                    m.Nama   LIKE @kw OR
-                    d.Nama   LIKE @kw OR
-                    m.NIM    LIKE @kw OR
-                    p.Status LIKE @kw
-                ORDER BY j.Tanggal DESC";
+                        SELECT
+                            NIM_Mahasiswa     AS [NIM],
+                            Nama_Mahasiswa    AS [Nama Mahasiswa],
+                            Nama_Dosen        AS [Nama Dosen],
+                            Tanggal           AS [Tanggal],
+                            WaktuMulai        AS [Jam Mulai],
+                            WaktuSelesai      AS [Jam Selesai],
+                            StatusPertemuan   AS [Status],
+                            CatatanPermintaan AS [Catatan]
+                        FROM ReportPertemuan
+                        WHERE
+                            Nama_Mahasiswa  LIKE @kw OR
+                            NIM_Mahasiswa   LIKE @kw OR
+                            Nama_Dosen      LIKE @kw OR
+                            StatusPertemuan LIKE @kw
+                        ORDER BY Tanggal DESC";
 
                     SqlDataAdapter da = new SqlDataAdapter(query, conn);
                     da.SelectCommand.Parameters.AddWithValue("@kw", "%" + keyword + "%");
@@ -80,13 +86,28 @@ namespace CRUDMahasiswaADO
 
                     dataGridView1.DataSource = dt;
 
-                    if (dataGridView1.Columns["ID"] != null)
-                        dataGridView1.Columns["ID"].Visible = false;
+                    // Format kolom Tanggal agar tampil dd/MM/yyyy
+                    if (dataGridView1.Columns["Tanggal"] != null)
+                        dataGridView1.Columns["Tanggal"].DefaultCellStyle.Format = "dd/MM/yyyy";
+
+                    // Format kolom jam agar tampil HH:mm
+                    foreach (string col in new[] { "Jam Mulai", "Jam Selesai" })
+                        if (dataGridView1.Columns[col] != null)
+                            dataGridView1.Columns[col].DefaultCellStyle.Format = @"hh\:mm";
+
+                    // Lebar kolom Catatan lebih besar
+                    if (dataGridView1.Columns["Catatan"] != null)
+                    {
+                        dataGridView1.Columns["Catatan"].AutoSizeMode =
+                            DataGridViewAutoSizeColumnMode.Fill;
+                        dataGridView1.Columns["Catatan"].FillWeight = 200;
+                    }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Gagal load report: " + ex.Message);
+                MessageBox.Show("Gagal load report: " + ex.Message,
+                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void btnRefresh_Click(object sender, EventArgs e)

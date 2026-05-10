@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -15,7 +16,9 @@ namespace CRUDMahasiswaADO
     {
         private int selectedID = 0;
         private readonly SqlConnection conn;
-        private readonly string connectionString = "Data Source=.;Initial Catalog=DBJadwalKoordinasi;Integrated Security=True";
+        private readonly string connectionString = "Data Source=LAPTOP-49331NDM\\RIANIINDRI;Initial Catalog=DBJadwalKoor;Integrated Security=True";
+
+
         public FormMahasiswa()
         {
             InitializeComponent();
@@ -162,12 +165,19 @@ namespace CRUDMahasiswaADO
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            if(e.RowIndex < 0) return;
+            if (e.RowIndex < 0) return;
             DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
-            selectedID = Convert.ToInt32(row.Cells["MahasiswaID"].Value);
-            txtNIM.Text = row.Cells["NIM"].Value?.ToString();
-            txtNama.Text = row.Cells["Nama"].Value?.ToString();
-            txtEmail.Text = row.Cells["Email"].Value?.ToString();
+            if (row.Cells["MahasiswaID"].Value != null && row.Cells["MahasiswaID"].Value != DBNull.Value)
+            {
+                selectedID = Convert.ToInt32(row.Cells["MahasiswaID"].Value);
+            }
+            else
+            {
+                selectedID = 0;
+            }
+            txtNIM.Text = row.Cells["NIM"].Value?.ToString() ?? "";
+            txtNama.Text = row.Cells["Nama"].Value?.ToString() ?? "";
+            txtEmail.Text = row.Cells["Email"].Value?.ToString() ?? "";
         }
         
 
@@ -217,15 +227,78 @@ namespace CRUDMahasiswaADO
             }
         }
 
-             private bool Validasi()
+         private bool Validasi()
         {
-            if (txtNIM.Text.Trim() == "")
+            string nim = txtNIM.Text.Trim();
+            if (string.IsNullOrWhiteSpace(nim))
             { MessageBox.Show("NIM harus diisi!"); txtNIM.Focus(); return false; }
-            if (txtNama.Text.Trim() == "")
+
+            if (!Regex.IsMatch(nim, @"^[0-9]+$"))
+            {
+                MessageBox.Show("NIM harus berupa angka, tidak boleh mengandung huruf atau simbol!");
+                txtNIM.Focus(); return false;
+            }
+
+            if (nim.Length != 11)
+            {
+                MessageBox.Show("NIM harus tepat 11 digit!");
+                txtNIM.Focus(); return false;
+            }
+
+            string nama = txtNama.Text.Trim();
+            if (string.IsNullOrWhiteSpace(nama))
             { MessageBox.Show("Nama harus diisi!"); txtNama.Focus(); return false; }
-            if (txtEmail.Text.Trim() == "")
+
+            if (nama.Length < 3)
+            { MessageBox.Show("Nama minimal 3 karakter!"); txtNama.Focus(); return false; }
+
+            if (nama.Length > 100)
+            { MessageBox.Show("Nama terlalu panjang (Maksimal 100 karakter)!"); txtNama.Focus(); return false; }
+
+            if (!Regex.IsMatch(nama, @"^[a-zA-Z\s]+$"))
+            {
+                MessageBox.Show("Nama hanya boleh berisi huruf!");
+                txtNama.Focus(); return false;
+            }
+
+            string email = txtEmail.Text.Trim().ToLower();
+            if (string.IsNullOrWhiteSpace(email))
             { MessageBox.Show("Email harus diisi!"); txtEmail.Focus(); return false; }
+
+            if (email.Length > 100)
+            { MessageBox.Show("Email terlalu panjang (Maksimal 100)!"); txtEmail.Focus(); return false; }
+
+            if (!Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$") || !email.EndsWith("@gmail.com"))
+            {
+                MessageBox.Show("Format email tidak valid! Harus menggunakan domain @gmail.com");
+                txtEmail.Focus(); return false;
+            }
+
+            if (IsEmailExists(email))
+            {
+                MessageBox.Show("Email sudah terdaftar!");
+                txtEmail.Focus();
+                return false;
+            }
+
             return true;
+        }
+
+        private bool IsEmailExists(string email)
+        {
+            using (SqlConnection dbConn = new SqlConnection(connectionString))
+            {
+                dbConn.Open();
+                string query = "SELECT COUNT(*) FROM Mahasiswa WHERE Email = @email";
+                if (selectedID != 0) query += " AND MahasiswaID <> @id";
+
+                using (SqlCommand cmd = new SqlCommand(query, dbConn))
+                {
+                    cmd.Parameters.AddWithValue("@email", email);
+                    if (selectedID != 0) cmd.Parameters.AddWithValue("@id", selectedID);
+                    return (int)cmd.ExecuteScalar() > 0;
+                }
+            }
         }
 
         private void btnSearch_Click(object sender, EventArgs e)

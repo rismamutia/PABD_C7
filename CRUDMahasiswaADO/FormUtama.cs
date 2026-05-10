@@ -25,15 +25,15 @@ namespace CRUDMahasiswaADO
 
             ToolStripMenuItem mnuData = new ToolStripMenuItem("Data Master");
             ToolStripMenuItem mnuMhs = new ToolStripMenuItem("Kelola Mahasiswa");
-            ToolStripMenuItem mnuDosen = new ToolStripMenuItem("Kelola Dosen");
+            ToolStripMenuItem mnuDosen = new ToolStripMenuItem("Kelola Dosen"); 
             ToolStripMenuItem mnuJadwal = new ToolStripMenuItem("Kelola Jadwal Dosen");
             ToolStripMenuItem mnuPertemuan = new ToolStripMenuItem("Kelola Jadwal Pertemuan");
             ToolStripMenuItem mnuReport = new ToolStripMenuItem("Report Pertemuan");
             ToolStripMenuItem mnuKeluar = new ToolStripMenuItem("Keluar");
 
             mnuMhs.Click += (s, e) => BukaForm(new FormMahasiswa());
-            mnuDosen.Click += (s, e) => BukaForm(new FormDosen());
-            mnuJadwal.Click += (s, e) => BukaForm(new Form());
+            mnuDosen.Click += (s, e) => BukaForm(new FormDataDosen());
+            mnuJadwal.Click += (s, e) => BukaForm(new FormDosen());
             mnuPertemuan.Click += (s, e) => BukaForm(new JadwalPertemuan());
             mnuReport.Click += (s, e) => BukaForm(new MelihatReport());
             mnuKeluar.Click += (s, e) => {

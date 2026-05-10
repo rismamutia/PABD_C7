@@ -28,10 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
-            this.txtNIDN = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.txtNama = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.cmbStatus = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -46,40 +43,20 @@
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.dtpTanggalKetersediaan = new System.Windows.Forms.DateTimePicker();
             this.dtpWaktuSelesai = new System.Windows.Forms.DateTimePicker();
+            this.cmbDosen = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.txtNIDN = new System.Windows.Forms.MaskedTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(37, 242);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(40, 16);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "NIDN";
-            // 
-            // txtNIDN
-            // 
-            this.txtNIDN.Location = new System.Drawing.Point(218, 236);
-            this.txtNIDN.Name = "txtNIDN";
-            this.txtNIDN.Size = new System.Drawing.Size(200, 22);
-            this.txtNIDN.TabIndex = 1;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(37, 273);
+            this.label2.Location = new System.Drawing.Point(37, 239);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(44, 16);
+            this.label2.Size = new System.Drawing.Size(87, 16);
             this.label2.TabIndex = 2;
-            this.label2.Text = "Nama";
-            // 
-            // txtNama
-            // 
-            this.txtNama.Location = new System.Drawing.Point(218, 267);
-            this.txtNama.Name = "txtNama";
-            this.txtNama.Size = new System.Drawing.Size(200, 22);
-            this.txtNama.TabIndex = 3;
+            this.label2.Text = "Nama Dosen";
             // 
             // label3
             // 
@@ -117,7 +94,7 @@
             this.dtpWaktuMulai.Format = System.Windows.Forms.DateTimePickerFormat.Time;
             this.dtpWaktuMulai.Location = new System.Drawing.Point(218, 329);
             this.dtpWaktuMulai.Name = "dtpWaktuMulai";
-            this.dtpWaktuMulai.Size = new System.Drawing.Size(200, 22);
+            this.dtpWaktuMulai.Size = new System.Drawing.Size(76, 22);
             this.dtpWaktuMulai.TabIndex = 7;
             // 
             // label5
@@ -210,14 +187,42 @@
             this.dtpWaktuSelesai.Format = System.Windows.Forms.DateTimePickerFormat.Time;
             this.dtpWaktuSelesai.Location = new System.Drawing.Point(218, 362);
             this.dtpWaktuSelesai.Name = "dtpWaktuSelesai";
-            this.dtpWaktuSelesai.Size = new System.Drawing.Size(200, 22);
+            this.dtpWaktuSelesai.Size = new System.Drawing.Size(76, 22);
             this.dtpWaktuSelesai.TabIndex = 19;
+            // 
+            // cmbDosen
+            // 
+            this.cmbDosen.FormattingEnabled = true;
+            this.cmbDosen.Location = new System.Drawing.Point(218, 236);
+            this.cmbDosen.Name = "cmbDosen";
+            this.cmbDosen.Size = new System.Drawing.Size(200, 24);
+            this.cmbDosen.TabIndex = 20;
+            this.cmbDosen.SelectedIndexChanged += new System.EventHandler(this.cmbDosen_SelectedIndexChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(37, 267);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(40, 16);
+            this.label1.TabIndex = 21;
+            this.label1.Text = "NIDN";
+            // 
+            // txtNIDN
+            // 
+            this.txtNIDN.Location = new System.Drawing.Point(218, 266);
+            this.txtNIDN.Name = "txtNIDN";
+            this.txtNIDN.Size = new System.Drawing.Size(200, 22);
+            this.txtNIDN.TabIndex = 22;
             // 
             // FormDosen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.txtNIDN);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.cmbDosen);
             this.Controls.Add(this.dtpWaktuSelesai);
             this.Controls.Add(this.dtpTanggalKetersediaan);
             this.Controls.Add(this.dataGridView1);
@@ -232,10 +237,7 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.cmbStatus);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.txtNama);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.txtNIDN);
-            this.Controls.Add(this.label1);
             this.Name = "FormDosen";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.FormDosen_Load_1);
@@ -246,11 +248,7 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox txtNIDN;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox txtNama;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox cmbStatus;
         private System.Windows.Forms.Label label4;
@@ -265,6 +263,9 @@
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.DateTimePicker dtpTanggalKetersediaan;
         private System.Windows.Forms.DateTimePicker dtpWaktuSelesai;
+        private System.Windows.Forms.ComboBox cmbDosen;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.MaskedTextBox txtNIDN;
     }
 }
 

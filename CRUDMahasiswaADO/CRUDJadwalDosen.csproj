@@ -114,6 +114,9 @@
     <EmbeddedResource Include="FormUtama.resx">
       <DependentUpon>FormUtama.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="FormUtama2.resx">
+      <DependentUpon>FormUtama2.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="JadwalPertemuan.resx">
       <DependentUpon>JadwalPertemuan.cs</DependentUpon>
     </EmbeddedResource>

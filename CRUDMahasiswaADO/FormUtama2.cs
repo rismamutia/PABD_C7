@@ -16,5 +16,10 @@ namespace CRUDMahasiswaADO
         {
             InitializeComponent();
         }
+
+        private void FormUtama2_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
