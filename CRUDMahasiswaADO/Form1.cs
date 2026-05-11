@@ -320,6 +320,9 @@ namespace CRUDMahasiswaADO
                 DataTable dt = new DataTable();
                 da.Fill(dt);
 
+                dtpTanggalKetersediaan.MinDate = DateTime.Today;
+                dtpTanggalKetersediaan.MaxDate = DateTime.Today.AddMonths(6);
+
                 cmbDosen.DataSource = dt;
                 cmbDosen.DisplayMember = "Nama";   // yang ditampilkan
                 cmbDosen.ValueMember = "DosenID";  // yang disimpan sebagai value
