@@ -88,6 +88,27 @@ JOIN Mahasiswa m ON p.MahasiswaID = m.MahasiswaID
 LEFT JOIN RiwayatKonsultasi rc ON p.PertemuanID = rc.PertemuanID;
 GO
 
+ALTER VIEW ReportPertemuan AS
+SELECT 
+    p.PertemuanID,
+    m.NIM               AS NIM_Mahasiswa,
+    m.Nama              AS Nama_Mahasiswa,
+    d.NIDN              AS NIDN_Dosen,
+    d.Nama              AS Nama_Dosen,
+    jd.Tanggal,
+    jd.WaktuMulai,
+    jd.WaktuSelesai,
+    p.Status            AS StatusPertemuan,
+    p.TanggalPermintaan,
+    p.CatatanPermintaan,                          -- TAMBAHAN
+    rc.Catatan          AS CatatanKonsultasi
+FROM Pertemuan p
+JOIN JadwalDosen jd ON p.JadwalID    = jd.JadwalID
+JOIN Dosen       d  ON jd.DosenID    = d.DosenID
+JOIN Mahasiswa   m  ON p.MahasiswaID = m.MahasiswaID
+LEFT JOIN RiwayatKonsultasi rc ON p.PertemuanID = rc.PertemuanID;
+
+
 INSERT INTO Admin
 (Username, PasswordHash, Nama, Email)
 VALUES

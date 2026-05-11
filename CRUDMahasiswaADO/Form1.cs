@@ -63,11 +63,15 @@ namespace CRUDMahasiswaADO
                     conn.Open();
                 }
 
+                // QUERY YANG DIUBAH:
                 string query = @"
-                            SELECT j.JadwalID, j.DosenID, d.NIDN, d.Nama, 
-                                   j.Tanggal, j.WaktuMulai, j.WaktuSelesai, j.Status
-                            FROM JadwalDosen j
-                            JOIN Dosen d ON j.DosenID = d.DosenID";
+            SELECT j.JadwalID, j.DosenID, d.NIDN, d.Nama, 
+                   j.Tanggal, j.WaktuMulai, j.WaktuSelesai, j.Status
+            FROM JadwalDosen j
+            JOIN Dosen d ON j.DosenID = d.DosenID
+            WHERE j.Tanggal >= CAST(GETDATE() AS DATE) 
+              AND j.Tanggal <= DATEADD(month, 6, GETDATE())
+            ORDER BY j.Tanggal ASC";
 
                 SqlDataAdapter da = new SqlDataAdapter(query, conn);
                 DataTable dt = new DataTable();
