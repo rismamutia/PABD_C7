@@ -305,6 +305,26 @@ namespace CRUDMahasiswaADO
             }
         }
 
+        private bool CekValidasi()
+        {
+            // 1. Validasi NIM (Harus 11 digit)
+            if (txtNIM.Text.Trim().Length != 11)
+            {
+                MessageBox.Show("NIM harus tepat 11 digit!", "Validasi Gagal", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNIM.Focus();
+                return false;
+            }
+
+            // 2. Validasi NIM (Hanya boleh angka)
+            if (!txtNIM.Text.All(char.IsDigit))
+            {
+                MessageBox.Show("NIM hanya boleh berisi angka!", "Validasi Gagal", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNIM.Focus();
+                return false;
+            }
+
+            
+        }
         private void txtNIM_Leave(object sender, EventArgs e)
         {
             CariMahasiswa();
