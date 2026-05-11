@@ -78,12 +78,13 @@
             // 
             // btnCari
             // 
+            this.btnCari.BackColor = System.Drawing.SystemColors.InactiveBorder;
             this.btnCari.Location = new System.Drawing.Point(690, 31);
             this.btnCari.Name = "btnCari";
             this.btnCari.Size = new System.Drawing.Size(75, 23);
             this.btnCari.TabIndex = 5;
             this.btnCari.Text = "Cari";
-            this.btnCari.UseVisualStyleBackColor = true;
+            this.btnCari.UseVisualStyleBackColor = false;
             this.btnCari.Click += new System.EventHandler(this.btnCari_Click);
             // 
             // MelihatReport

@@ -58,9 +58,9 @@
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(60, 234);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(53, 16);
+            this.label4.Size = new System.Drawing.Size(191, 16);
             this.label4.TabIndex = 3;
-            this.label4.Text = "Catatan";
+            this.label4.Text = "Lokasi dan Catatan Tambahan";
             // 
             // txtNIM
             // 
@@ -71,9 +71,9 @@
             // 
             // txtCatatan
             // 
-            this.txtCatatan.Location = new System.Drawing.Point(148, 234);
+            this.txtCatatan.Location = new System.Drawing.Point(257, 234);
             this.txtCatatan.Name = "txtCatatan";
-            this.txtCatatan.Size = new System.Drawing.Size(291, 22);
+            this.txtCatatan.Size = new System.Drawing.Size(327, 22);
             this.txtCatatan.TabIndex = 7;
             // 
             // label5
@@ -281,7 +281,7 @@
             this.Controls.Add(this.txtNIM);
             this.Controls.Add(this.label4);
             this.Name = "JadwalPertemuan";
-            this.Text = "JadwalPertemuan";
+            this.Text = " k";
             this.Load += new System.EventHandler(this.JadwalPertemuan_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);

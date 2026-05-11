@@ -94,7 +94,7 @@
             this.dtpWaktuMulai.Format = System.Windows.Forms.DateTimePickerFormat.Time;
             this.dtpWaktuMulai.Location = new System.Drawing.Point(218, 329);
             this.dtpWaktuMulai.Name = "dtpWaktuMulai";
-            this.dtpWaktuMulai.Size = new System.Drawing.Size(76, 22);
+            this.dtpWaktuMulai.Size = new System.Drawing.Size(85, 22);
             this.dtpWaktuMulai.TabIndex = 7;
             // 
             // label5
@@ -187,7 +187,7 @@
             this.dtpWaktuSelesai.Format = System.Windows.Forms.DateTimePickerFormat.Time;
             this.dtpWaktuSelesai.Location = new System.Drawing.Point(218, 362);
             this.dtpWaktuSelesai.Name = "dtpWaktuSelesai";
-            this.dtpWaktuSelesai.Size = new System.Drawing.Size(76, 22);
+            this.dtpWaktuSelesai.Size = new System.Drawing.Size(85, 22);
             this.dtpWaktuSelesai.TabIndex = 19;
             // 
             // cmbDosen
