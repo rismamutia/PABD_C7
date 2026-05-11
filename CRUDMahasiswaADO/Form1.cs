@@ -152,6 +152,16 @@ namespace CRUDMahasiswaADO
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
+            if (SelectedDosenID == 0) { MessageBox.Show("Pilih dosen!"); return; }
+            if (!ValidasiLogikaInput()) return;
+
+            // Cek Bentrok
+            if (IsJadwalBentrok(SelectedDosenID, dtpTanggalKetersediaan.Value, dtpWaktuMulai.Value.TimeOfDay, dtpWaktuSelesai.Value.TimeOfDay))
+            {
+                MessageBox.Show("Dosen sudah memiliki jadwal lain di jam yang bersinggungan!");
+                return;
+            }
+
             if (SelectedID == 0)
             {
                 MessageBox.Show("Pilih data di tabel terlebih dahulu!");
