@@ -100,6 +100,16 @@ namespace CRUDMahasiswaADO
         }
         private void btnInsert_Click(object sender, EventArgs e)
         {
+            if (SelectedDosenID == 0) { MessageBox.Show("Pilih dosen!"); return; }
+            if (!ValidasiLogikaInput()) return;
+
+            // Cek Bentrok
+            if (IsJadwalBentrok(SelectedDosenID, dtpTanggalKetersediaan.Value, dtpWaktuMulai.Value.TimeOfDay, dtpWaktuSelesai.Value.TimeOfDay))
+            {
+                MessageBox.Show("Dosen sudah memiliki jadwal lain di jam yang bersinggungan!");
+                return;
+            }
+
             if (SelectedDosenID == 0)
             {
                 MessageBox.Show("Pilih dosen terlebih dahulu!");
@@ -430,5 +440,7 @@ namespace CRUDMahasiswaADO
             catch (Exception ex) { MessageBox.Show("Error Cek Bentrok: " + ex.Message); }
             return bentrok;
         }
+
+
     }
 }
