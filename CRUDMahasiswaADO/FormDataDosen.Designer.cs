@@ -105,7 +105,7 @@
             // 
             this.btnLoad.Location = new System.Drawing.Point(543, 81);
             this.btnLoad.Name = "btnLoad";
-            this.btnLoad.Size = new System.Drawing.Size(135, 23);
+            this.btnLoad.Size = new System.Drawing.Size(135, 31);
             this.btnLoad.TabIndex = 7;
             this.btnLoad.Text = "Menampilkan Data";
             this.btnLoad.UseVisualStyleBackColor = true;
