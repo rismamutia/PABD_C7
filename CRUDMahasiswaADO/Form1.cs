@@ -354,7 +354,7 @@ namespace CRUDMahasiswaADO
             }
         }
 
-private void textBox1_TextChanged(object sender, EventArgs e)
+        private void textBox1_TextChanged(object sender, EventArgs e)
         {
 
         }
@@ -366,6 +366,69 @@ private void textBox1_TextChanged(object sender, EventArgs e)
                 txtNIDN.Text = row["NIDN"].ToString();
                 SelectedDosenID = Convert.ToInt32(row["DosenID"]);
             }
+        }
+
+
+
+        private bool ValidasiLogikaInput()
+        {
+            TimeSpan mulai = dtpWaktuMulai.Value.TimeOfDay;
+            TimeSpan selesai = dtpWaktuSelesai.Value.TimeOfDay;
+            TimeSpan jamMasuk = new TimeSpan(7, 0, 0);  // 07:00
+            TimeSpan jamPulang = new TimeSpan(17, 0, 0); // 17:00
+
+            // 1. Cek Jam Kerja
+            if (mulai < jamMasuk || selesai > jamPulang)
+            {
+                MessageBox.Show("Jadwal harus di dalam jam kerja (07:00 - 17:00)!");
+                return false;
+            }
+
+            // 2. Cek Urutan Waktu
+            if (mulai >= selesai)
+            {
+                MessageBox.Show("Waktu mulai harus lebih awal dari waktu selesai!");
+                return false;
+            }
+
+            // 3. Cek Durasi Minimal (15 Menit)
+            if ((selesai - mulai).TotalMinutes < 15)
+            {
+                MessageBox.Show("Durasi jadwal minimal adalah 15 menit!");
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool IsJadwalBentrok(int dosenID, DateTime tanggal, TimeSpan mulai, TimeSpan selesai, int currentJadwalID = 0)
+        {
+            bool bentrok = false;
+            try
+            {
+                if (conn.State == ConnectionState.Closed) conn.Open();
+
+                // Query untuk mengecek irisan waktu
+                string query = @"SELECT COUNT(*) FROM JadwalDosen 
+                         WHERE DosenID = @DosenID 
+                         AND Tanggal = @Tanggal 
+                         AND JadwalID <> @CurrentID
+                         AND ((@Mulai >= WaktuMulai AND @Mulai < WaktuSelesai) 
+                              OR (@Selesai > WaktuMulai AND @Selesai <= WaktuSelesai)
+                              OR (WaktuMulai >= @Mulai AND WaktuMulai < @Selesai))";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@DosenID", dosenID);
+                cmd.Parameters.AddWithValue("@Tanggal", tanggal.Date);
+                cmd.Parameters.AddWithValue("@Mulai", mulai);
+                cmd.Parameters.AddWithValue("@Selesai", selesai);
+                cmd.Parameters.AddWithValue("@CurrentID", currentJadwalID);
+
+                int count = (int)cmd.ExecuteScalar();
+                if (count > 0) bentrok = true;
+            }
+            catch (Exception ex) { MessageBox.Show("Error Cek Bentrok: " + ex.Message); }
+            return bentrok;
         }
     }
 }
