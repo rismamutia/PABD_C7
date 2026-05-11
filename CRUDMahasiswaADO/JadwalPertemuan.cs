@@ -322,8 +322,25 @@ namespace CRUDMahasiswaADO
                 txtNIM.Focus();
                 return false;
             }
-
             
+            // 3. Validasi Nama (Tidak boleh ada angka)
+            // Jika nama didapat dari hasil cari (txtNamaMahasiswa), tetap perlu divalidasi
+            if (txtNamaMahasiswa.Text.Any(char.IsDigit))
+            {
+                MessageBox.Show("Nama tidak boleh mengandung angka!", "Validasi Gagal", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            // 4. Validasi Catatan (Jangan kosong)
+            if (string.IsNullOrWhiteSpace(txtCatatan.Text))
+            {
+                MessageBox.Show("Catatan permintaan tidak boleh kosong!", "Validasi Gagal", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCatatan.Focus();
+                return false;
+            }
+
+            return true;
+
         }
         private void txtNIM_Leave(object sender, EventArgs e)
         {
