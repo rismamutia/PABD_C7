@@ -49,22 +49,24 @@
             // 
             // btnRefresh
             // 
+            this.btnRefresh.BackColor = System.Drawing.Color.LightGreen;
             this.btnRefresh.Location = new System.Drawing.Point(290, 367);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(115, 39);
             this.btnRefresh.TabIndex = 1;
             this.btnRefresh.Text = "Refresh";
-            this.btnRefresh.UseVisualStyleBackColor = true;
+            this.btnRefresh.UseVisualStyleBackColor = false;
             this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
             // 
             // btnClose
             // 
+            this.btnClose.BackColor = System.Drawing.Color.Red;
             this.btnClose.Location = new System.Drawing.Point(447, 367);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(115, 39);
             this.btnClose.TabIndex = 2;
             this.btnClose.Text = "Close";
-            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.UseVisualStyleBackColor = false;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
             // txtSearch
