@@ -49,7 +49,7 @@
             // 
             // btnRefresh
             // 
-            this.btnRefresh.Location = new System.Drawing.Point(302, 367);
+            this.btnRefresh.Location = new System.Drawing.Point(325, 367);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(75, 23);
             this.btnRefresh.TabIndex = 1;
@@ -59,7 +59,7 @@
             // 
             // btnClose
             // 
-            this.btnClose.Location = new System.Drawing.Point(383, 367);
+            this.btnClose.Location = new System.Drawing.Point(447, 367);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(75, 23);
             this.btnClose.TabIndex = 2;
@@ -69,9 +69,9 @@
             // 
             // txtSearch
             // 
-            this.txtSearch.Location = new System.Drawing.Point(548, 31);
+            this.txtSearch.Location = new System.Drawing.Point(406, 31);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(127, 22);
+            this.txtSearch.Size = new System.Drawing.Size(278, 22);
             this.txtSearch.TabIndex = 4;
             // 
             // btnCari
