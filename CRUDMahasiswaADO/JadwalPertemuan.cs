@@ -96,6 +96,10 @@ namespace CRUDMahasiswaADO
 
         private void btnInsert_Click(object sender, EventArgs e)
         {
+            if (!CekValidasi()) return;
+
+            if (selectedMahasiswaID == 0) { MessageBox.Show("Cari NIM dulu!"); return; }
+            if (cmbJadwal.SelectedValue == null) { MessageBox.Show("Pilih Jadwal!"); return; }
             if (selectedMahasiswaID == 0) { MessageBox.Show("Cari NIM dulu!"); return; }
             if (cmbJadwal.SelectedValue == null) { MessageBox.Show("Pilih Jadwal!"); return; }
 
