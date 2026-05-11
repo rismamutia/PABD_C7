@@ -220,6 +220,21 @@ namespace CRUDMahasiswaADO
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
+            if (SelectedID == 0) return;
+
+            // VALIDASI: Jadwal yang sudah Booked tidak boleh dihapus
+            if (cmbStatus.Text == "Booked")
+            {
+                MessageBox.Show("Jadwal yang sudah berstatus 'Booked' tidak boleh dihapus!", "Akses Ditolak", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                return;
+            }
+
+            DialogResult res = MessageBox.Show("Apakah anda yakin menghapus jadwal ini?", "Konfirmasi", MessageBoxButtons.YesNo);
+            if (res == DialogResult.Yes)
+            {
+                // ... proses delete kamu ...
+            }
+
             try
             {
                 if (conn.State == System.Data.ConnectionState.Closed)
