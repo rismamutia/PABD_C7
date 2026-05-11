@@ -48,8 +48,6 @@
             this.cmbJadwal = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.dtpTanggalPermintaan = new System.Windows.Forms.DateTimePicker();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -237,29 +235,11 @@
             this.label2.TabIndex = 25;
             this.label2.Text = "Pilih Jadwal Tersedia";
             // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(359, 154);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(129, 16);
-            this.label6.TabIndex = 26;
-            this.label6.Text = "Tanggal Permintaan";
-            // 
-            // dtpTanggalPermintaan
-            // 
-            this.dtpTanggalPermintaan.Location = new System.Drawing.Point(362, 175);
-            this.dtpTanggalPermintaan.Name = "dtpTanggalPermintaan";
-            this.dtpTanggalPermintaan.Size = new System.Drawing.Size(222, 22);
-            this.dtpTanggalPermintaan.TabIndex = 27;
-            // 
             // JadwalPertemuan
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.dtpTanggalPermintaan);
-            this.Controls.Add(this.label6);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cmbJadwal);
@@ -310,7 +290,5 @@
         private System.Windows.Forms.ComboBox cmbJadwal;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.DateTimePicker dtpTanggalPermintaan;
     }
 }
