@@ -95,7 +95,7 @@
             // 
             this.btnConnect.Location = new System.Drawing.Point(543, 39);
             this.btnConnect.Name = "btnConnect";
-            this.btnConnect.Size = new System.Drawing.Size(135, 23);
+            this.btnConnect.Size = new System.Drawing.Size(135, 36);
             this.btnConnect.TabIndex = 6;
             this.btnConnect.Text = "Membuka Koneksi";
             this.btnConnect.UseVisualStyleBackColor = true;
