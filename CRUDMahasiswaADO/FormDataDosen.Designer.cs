@@ -115,10 +115,10 @@
             // 
             // btnConnect
             // 
-            this.btnConnect.Location = new System.Drawing.Point(407, 32);
+            this.btnConnect.Location = new System.Drawing.Point(407, 38);
             this.btnConnect.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnConnect.Name = "btnConnect";
-            this.btnConnect.Size = new System.Drawing.Size(101, 29);
+            this.btnConnect.Size = new System.Drawing.Size(101, 23);
             this.btnConnect.TabIndex = 6;
             this.btnConnect.Text = "Membuka Koneksi";
             this.btnConnect.UseVisualStyleBackColor = true;
@@ -126,7 +126,7 @@
             // 
             // btnLoad
             // 
-            this.btnLoad.Location = new System.Drawing.Point(407, 66);
+            this.btnLoad.Location = new System.Drawing.Point(407, 69);
             this.btnLoad.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(101, 25);
