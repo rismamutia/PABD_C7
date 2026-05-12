@@ -142,13 +142,14 @@
             // 
             // btnLoad
             // 
+            this.btnLoad.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.btnLoad.Location = new System.Drawing.Point(486, 58);
             this.btnLoad.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(105, 24);
             this.btnLoad.TabIndex = 12;
             this.btnLoad.Text = "Menampilkan Data";
-            this.btnLoad.UseVisualStyleBackColor = true;
+            this.btnLoad.UseVisualStyleBackColor = false;
             this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
             // 
             // btnInsert
