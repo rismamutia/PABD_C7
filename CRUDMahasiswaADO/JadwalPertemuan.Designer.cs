@@ -114,7 +114,7 @@
             this.cmbStatus.Location = new System.Drawing.Point(48, 156);
             this.cmbStatus.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.cmbStatus.Name = "cmbStatus";
-            this.cmbStatus.Size = new System.Drawing.Size(158, 21);
+            this.cmbStatus.Size = new System.Drawing.Size(174, 21);
             this.cmbStatus.TabIndex = 9;
             // 
             // dataGridView1
@@ -243,7 +243,7 @@
             this.cmbDosen.Location = new System.Drawing.Point(48, 118);
             this.cmbDosen.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.cmbDosen.Name = "cmbDosen";
-            this.cmbDosen.Size = new System.Drawing.Size(158, 21);
+            this.cmbDosen.Size = new System.Drawing.Size(174, 21);
             this.cmbDosen.TabIndex = 22;
             this.cmbDosen.SelectedIndexChanged += new System.EventHandler(this.cmbDosen_SelectedIndexChanged);
             // 
