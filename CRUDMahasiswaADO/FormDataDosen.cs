@@ -16,8 +16,10 @@ namespace CRUDMahasiswaADO
         private int selectedID = 0;
 
         private readonly SqlConnection conn;
-        private readonly string connectionString = "Data Source=LAPTOP-49331NDM\\RIANIINDRI;Initial Catalog=DBJadwalKoor;Integrated Security=True";
+        private readonly string connectionString = "Data Source=erlinaaa\\ERLINASHAFIRA;Initial Catalog=DBJadwalKoor;Integrated Security=True";
 
+        BindingSource bs = new BindingSource();
+        private DataTable dtDosen = new DataTable();
         public FormDataDosen()
         {
             InitializeComponent();
@@ -50,40 +52,7 @@ namespace CRUDMahasiswaADO
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
-            try
-            {
-                if (conn.State == System.Data.ConnectionState.Closed)
-                {
-                    conn.Open();
-                }
-
-                dataGridView1.Rows.Clear();
-                dataGridView1.Columns.Clear();
-
-                dataGridView1.Columns.Add("NIDN", "NIDN");
-                dataGridView1.Columns.Add("Nama", "Nama");
-                dataGridView1.Columns.Add("Email", "Email");
-
-                string query = "SELECT * FROM Dosen";
-
-                SqlCommand cmd = new SqlCommand(query, conn);
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    dataGridView1.Rows.Add(
-                        reader["NIDN"].ToString(),
-                        reader["Nama"].ToString(),
-                        reader["Email"].ToString()
-                    );
-                }
-
-                reader.Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Gagal menampilkan data: " + ex.Message);
-            }
+            LoadData();
         }
 
         private void btnInsert_Click(object sender, EventArgs e)
@@ -97,9 +66,9 @@ namespace CRUDMahasiswaADO
                     conn.Open();
                 }
 
-                string query = @"INSERT INTO Dosen (NIDN, Nama, Email) VALUES (@NIDN, @Nama, @Email)";
+                SqlCommand cmd = new SqlCommand("sp_InsertDosen", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
 
-                SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@NIDN", txtNIDN.Text.Trim());
                 cmd.Parameters.AddWithValue("@Nama", txtNama.Text.Trim());
                 cmd.Parameters.AddWithValue("@Email", txtEmail.Text.Trim().ToLower());
@@ -125,6 +94,10 @@ namespace CRUDMahasiswaADO
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
+            selectedID = Convert.ToInt32(
+                ((DataRowView)bs.Current)["DosenID"]
+            );
+
             if (!Validasi()) return;
 
             try
@@ -134,10 +107,10 @@ namespace CRUDMahasiswaADO
                     conn.Open();
                 }
 
-                string query = @"UPDATE Dosen SET Nama = @Nama, Email = @Email WHERE NIDN = @NIDN";
+                SqlCommand cmd = new SqlCommand("sp_UpdateDosen", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
 
-                SqlCommand cmd = new SqlCommand(query, conn);
-
+                cmd.Parameters.AddWithValue("@ID", selectedID);
                 cmd.Parameters.AddWithValue("@NIDN", txtNIDN.Text.Trim());
                 cmd.Parameters.AddWithValue("@Nama", txtNama.Text.Trim());
                 cmd.Parameters.AddWithValue("@Email", txtEmail.Text.Trim().ToLower());
@@ -148,7 +121,7 @@ namespace CRUDMahasiswaADO
                 {
                     MessageBox.Show("Data berhasil diupdate");
                     ClearForm();
-                    btnLoad.PerformClick();
+                    LoadData();
                 }
                 else
                 {
@@ -163,6 +136,16 @@ namespace CRUDMahasiswaADO
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
+            selectedID = Convert.ToInt32(
+       ((DataRowView)bs.Current)["DosenID"]
+   );
+
+            if (selectedID == 0)
+            {
+                MessageBox.Show("Data tidak ditemukan");
+                return;
+            }
+
             try
             {
                 if (conn.State == System.Data.ConnectionState.Closed)
@@ -178,10 +161,10 @@ namespace CRUDMahasiswaADO
 
                 if (resultConfirm == DialogResult.Yes)
                 {
-                    string query = "DELETE FROM Dosen WHERE NIDN = @NIDN";
+                    SqlCommand cmd = new SqlCommand("sp_DeleteDosen", conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
 
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@NIDN", txtNIDN.Text.Trim());
+                    cmd.Parameters.AddWithValue("@ID", selectedID);
 
                     int result = cmd.ExecuteNonQuery();
 
@@ -189,7 +172,7 @@ namespace CRUDMahasiswaADO
                     {
                         MessageBox.Show("Data berhasil dihapus");
                         ClearForm();
-                        btnLoad.PerformClick();
+                        LoadData();
                     }
                     else
                     {
@@ -209,9 +192,11 @@ namespace CRUDMahasiswaADO
             {
                 DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
 
-                txtNIDN.Text = row.Cells[0].Value?.ToString();
-                txtNama.Text = row.Cells[1].Value?.ToString();
-                txtEmail.Text = row.Cells[2].Value?.ToString();
+                selectedID = Convert.ToInt32(row.Cells["DosenID"].Value);
+
+                txtNIDN.Text = row.Cells["NIDN"].Value.ToString();
+                txtNama.Text = row.Cells["Nama"].Value.ToString();
+                txtEmail.Text = row.Cells["Email"].Value.ToString();
             }
         }
 
@@ -220,6 +205,7 @@ namespace CRUDMahasiswaADO
             txtNIDN.Clear();
             txtNama.Clear();
             txtEmail.Clear();
+            selectedID = 0;
         }
 
         private bool Validasi()
@@ -241,8 +227,12 @@ namespace CRUDMahasiswaADO
             if (nama.Length < 3 || nama.Length > 100)
             { MessageBox.Show("Nama harus 3-100 karakter!"); txtNama.Focus(); return false; }
 
-            if (!System.Text.RegularExpressions.Regex.IsMatch(nama, @"^[a-zA-Z\s]+$"))
-            { MessageBox.Show("Nama hanya boleh berisi huruf!"); txtNama.Focus(); return false; }
+            if (!System.Text.RegularExpressions.Regex.IsMatch(nama, @"^[a-zA-Z\s\.,]+$"))
+            {
+                MessageBox.Show("Nama hanya boleh berisi huruf, spasi, titik, dan koma!");
+                txtNama.Focus();
+                return false;
+            }
 
             string email = txtEmail.Text.Trim().ToLower();
             if (string.IsNullOrWhiteSpace(email))
@@ -251,8 +241,12 @@ namespace CRUDMahasiswaADO
             if (email.Length > 100)
             { MessageBox.Show("Email maksimal 100 karakter!"); txtEmail.Focus(); return false; }
 
-            if (!System.Text.RegularExpressions.Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$") || !email.EndsWith("@gmail.com"))
-            { MessageBox.Show("Email harus format @gmail.com yang valid!"); txtEmail.Focus(); return false; }
+            if (!System.Text.RegularExpressions.Regex.IsMatch(email, @"^[^@\s]+@mail\.umy\.ac\.id$"))
+            {
+                MessageBox.Show("Email harus menggunakan domain @mail.umy.ac.id");
+                txtEmail.Focus();
+                return false;
+            }
 
             if (IsEmailExists(email))
             { MessageBox.Show("Email sudah terdaftar!"); txtEmail.Focus(); return false; }
@@ -265,12 +259,15 @@ namespace CRUDMahasiswaADO
             using (SqlConnection dbConn = new SqlConnection(connectionString))
             {
                 dbConn.Open();
-                string query = "SELECT COUNT(*) FROM Dosen WHERE Email = @email AND NIDN <> @nidn";
+
+                string query = "SELECT COUNT(*) FROM Dosen " +
+                               "WHERE Email = @email AND DosenID <> @id";
 
                 using (SqlCommand cmd = new SqlCommand(query, dbConn))
                 {
                     cmd.Parameters.AddWithValue("@email", email);
-                    cmd.Parameters.AddWithValue("@nidn", txtNIDN.Text.Trim());
+                    cmd.Parameters.AddWithValue("@id", selectedID);
+
                     return (int)cmd.ExecuteScalar() > 0;
                 }
             }
@@ -287,7 +284,47 @@ namespace CRUDMahasiswaADO
             dataGridView1.AllowUserToAddRows = false;
             dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
-            btnLoad.PerformClick();
+            bindingNavigator1.BindingSource = bs;
+
+            LoadData();
+        }
+
+        private void LoadData()
+        {
+            try
+            {
+                if (conn.State == ConnectionState.Closed)
+                    conn.Open();
+
+                string query = "SELECT * FROM View_DataDosen";
+
+                SqlDataAdapter da = new SqlDataAdapter(query, conn);
+
+                dtDosen = new DataTable();
+
+                da.Fill(dtDosen);
+
+                bs.DataSource = dtDosen;
+
+                dataGridView1.DataSource = bs;
+
+                BindControls();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void BindControls()
+        {
+            txtNIDN.DataBindings.Clear();
+            txtNama.DataBindings.Clear();
+            txtEmail.DataBindings.Clear();
+
+            txtNIDN.DataBindings.Add("Text", bs, "NIDN");
+            txtNama.DataBindings.Add("Text", bs, "Nama");
+            txtEmail.DataBindings.Add("Text", bs, "Email");
         }
     }
 }

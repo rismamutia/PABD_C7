@@ -33,10 +33,10 @@ namespace CRUDMahasiswaADO
                 {
                     conn.Open();
                     string query = "SELECT AdminID, Nama FROM Admin " +
-                                   "WHERE Username = @u AND PasswordHash = @p";
+                       "WHERE Username = '" + txtUsername.Text.Trim() +
+                       "' AND PasswordHash = '" + txtPassword.Text.Trim() + "'";
+
                     SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@u", txtUsername.Text.Trim());
-                    cmd.Parameters.AddWithValue("@p", txtPassword.Text.Trim());
 
                     SqlDataReader reader = cmd.ExecuteReader();
                     if (reader.Read())

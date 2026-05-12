@@ -14,11 +14,15 @@ namespace CRUDMahasiswaADO
 {
     public partial class JadwalPertemuan : Form
     {
-        private readonly string connectionString = "Data Source=LAPTOP-49331NDM\\RIANIINDRI;Initial Catalog=DBJadwalKoor;Integrated Security=True";
+        private readonly string connectionString = "Data Source=erlinaaa\\ERLINASHAFIRA;Initial Catalog=DBJadwalKoor;Integrated Security=True";
         private readonly SqlConnection conn;
 
         private int selectedMahasiswaID = 0;
         private int selectedPertemuanID = 0;
+
+        private BindingSource bs = new BindingSource();
+
+        private DataTable dtBooking = new DataTable();
 
         public JadwalPertemuan()
         {
@@ -27,26 +31,6 @@ namespace CRUDMahasiswaADO
             dataGridView1.CellClick += dataGridView1_CellContentClick;
         }
 
-        private void LoadData()
-        {
-            try
-            {
-                if (conn.State == ConnectionState.Closed)
-                    conn.Open();
-
-                string query = "SELECT * FROM Pertemuan";
-
-                SqlDataAdapter da = new SqlDataAdapter(query, conn);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-
-                dataGridView1.DataSource = dt;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Load gagal: " + ex.Message);
-            }
-        }
         private void ConnectDatabase()
         {
             try
@@ -71,22 +55,26 @@ namespace CRUDMahasiswaADO
         {
             try
             {
-                if (conn.State == ConnectionState.Closed) conn.Open();
-                string query = @"
-            SELECT p.PertemuanID, m.NIM, m.Nama AS Mahasiswa, d.Nama AS Dosen,
-                   jd.Tanggal, LEFT(CONVERT(VARCHAR, jd.WaktuMulai, 108), 5) + '-' + 
-                   LEFT(CONVERT(VARCHAR, jd.WaktuSelesai, 108), 5) AS Jam,
-                   p.Status, p.TanggalPermintaan, p.CatatanPermintaan
-            FROM Pertemuan p
-            JOIN Mahasiswa m ON p.MahasiswaID = m.MahasiswaID
-            JOIN JadwalDosen jd ON p.JadwalID = jd.JadwalID
-            JOIN Dosen d ON jd.DosenID = d.DosenID
-            ORDER BY p.PertemuanID DESC";
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    using (SqlCommand cmd = new SqlCommand("sp_GetBooking", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
 
-                SqlDataAdapter da = new SqlDataAdapter(query, conn);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                dataGridView1.DataSource = dt;
+                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                        {
+                            dtBooking = new DataTable();
+
+                            da.Fill(dtBooking);
+
+                            bs.DataSource = dtBooking;
+
+                            dataGridView1.DataSource = bs;
+
+                            BindControls();
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -94,6 +82,44 @@ namespace CRUDMahasiswaADO
             }
         }
 
+
+        private void BindControls()
+        {
+            txtNIM.DataBindings.Clear();
+
+            txtNamaMahasiswa.DataBindings.Clear();
+
+            txtCatatan.DataBindings.Clear();
+
+            cmbStatus.DataBindings.Clear();
+
+            cmbDosen.DataBindings.Clear();
+
+            txtNIM.DataBindings.Add(
+                "Text",
+                bs,
+                "NIM_Mahasiswa");
+
+            txtNamaMahasiswa.DataBindings.Add(
+                "Text",
+                bs,
+                "Nama_Mahasiswa");
+
+            txtCatatan.DataBindings.Add(
+            "Text",
+            bs,
+            "CatatanPermintaan");
+
+            cmbStatus.DataBindings.Add(
+                "Text",
+                bs,
+                "Status_Booking");
+
+            cmbDosen.DataBindings.Add(
+                "Text",
+                bs,
+                "Nama_Dosen");
+        }
 
         private void btnInsert_Click(object sender, EventArgs e)
         {
@@ -107,47 +133,43 @@ namespace CRUDMahasiswaADO
                 if (conn.State == ConnectionState.Closed) conn.Open();
 
                 // Gunakan Transaction agar jika salah satu gagal, semua dibatalkan
-                SqlTransaction trans = conn.BeginTransaction();
+                SqlCommand cmd = new SqlCommand("sp_InsertBooking", conn);
 
-                try
-                {
-                    // 1. Simpan data pertemuan
-                    string queryInsert = @"INSERT INTO Pertemuan (JadwalID, MahasiswaID, Status, TanggalPermintaan, CatatanPermintaan)
-                                   VALUES (@Jid, @Mid, 'Pending', GETDATE(), @Catatan)";
-                    SqlCommand cmdInsert = new SqlCommand(queryInsert, conn, trans);
-                    cmdInsert.Parameters.AddWithValue("@Jid", jadID);
-                    cmdInsert.Parameters.AddWithValue("@Mid", selectedMahasiswaID);
-                    cmdInsert.Parameters.AddWithValue("@Catatan", txtCatatan.Text.Trim());
-                    cmdInsert.ExecuteNonQuery();
+                cmd.CommandType = CommandType.StoredProcedure;
 
-                    // 2. UPDATE Status Jadwal menjadi 'Booked' agar tidak bisa dipilih orang lain
-                    string queryUpdate = "UPDATE JadwalDosen SET Status = 'Booked' WHERE JadwalID = @Jid";
-                    SqlCommand cmdUpdate = new SqlCommand(queryUpdate, conn, trans);
-                    cmdUpdate.Parameters.AddWithValue("@Jid", jadID);
-                    cmdUpdate.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@Jid", jadID);
 
-                    trans.Commit(); // Simpan permanen ke DB
+                cmd.Parameters.AddWithValue("@Mid", selectedMahasiswaID);
 
-                    MessageBox.Show("Booking berhasil! Jadwal telah dipesan.");
+                cmd.Parameters.AddWithValue("@Catatan", txtCatatan.Text.Trim());
 
-                    LoadGrid();
-                    ClearForm();
+                cmd.ExecuteNonQuery();
 
-                    // Refresh ComboBox agar jadwal yang baru saja dibooking menghilang
-                    LoadJadwalByDosen((int)cmbDosen.SelectedValue);
-                }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
-                    throw ex;
-                }
+                MessageBox.Show("Booking berhasil!");
+
+                LoadGrid();
+
+                ClearForm();
+
+                LoadJadwalByDosen((int)cmbDosen.SelectedValue);
             }
-            catch (Exception ex) { MessageBox.Show("Gagal: " + ex.Message); }
+            catch (Exception ex) 
+            { 
+                MessageBox.Show("Gagal: " + ex.Message); 
+            }
         }
+
 
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
+            if (bs.Current != null)
+            {
+                selectedPertemuanID =
+                    Convert.ToInt32(
+                        ((DataRowView)bs.Current)["PertemuanID"]);
+            }
+
             if (selectedPertemuanID == 0)
             {
                 MessageBox.Show("Silakan pilih data yang ingin diubah dari tabel terlebih dahulu!", "Peringatan");
@@ -160,23 +182,38 @@ namespace CRUDMahasiswaADO
                 try
                 {
                     if (conn.State == ConnectionState.Closed) conn.Open();
-                    string query = "UPDATE Pertemuan SET Status = @Status, CatatanPermintaan = @Catatan WHERE PertemuanID = @ID";
-                    SqlCommand cmd = new SqlCommand(query, conn);
+                    SqlCommand cmd = new SqlCommand("sp_UpdateBooking", conn);
+
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@Pid", selectedPertemuanID);
+
                     cmd.Parameters.AddWithValue("@Status", cmbStatus.Text);
+
                     cmd.Parameters.AddWithValue("@Catatan", txtCatatan.Text.Trim());
-                    cmd.Parameters.AddWithValue("@ID", selectedPertemuanID);
+
                     cmd.ExecuteNonQuery();
 
                     MessageBox.Show("Data berhasil diperbarui!");
                     LoadGrid();
                 }
-                catch (Exception ex) { MessageBox.Show("Gagal Update: " + ex.Message); }
+                catch (Exception ex) 
+                { 
+                    MessageBox.Show("Gagal Update: " + ex.Message); 
+                }
             }
         }
 
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
+            if (bs.Current != null)
+            {
+                selectedPertemuanID =
+                    Convert.ToInt32(
+                        ((DataRowView)bs.Current)["PertemuanID"]);
+            }
+
             if (selectedPertemuanID == 0)
             {
                 MessageBox.Show("Pilih data yang ingin dihapus terlebih dahulu!", "Peringatan");
@@ -196,9 +233,12 @@ namespace CRUDMahasiswaADO
                 try
                 {
                     if (conn.State == ConnectionState.Closed) conn.Open();
-                    string query = "DELETE FROM Pertemuan WHERE PertemuanID = @ID";
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@ID", selectedPertemuanID);
+                    SqlCommand cmd = new SqlCommand("sp_DeleteBooking", conn);
+
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@Pid", selectedPertemuanID);
+
                     cmd.ExecuteNonQuery();
 
                     MessageBox.Show("Data berhasil dihapus!");
@@ -209,41 +249,56 @@ namespace CRUDMahasiswaADO
             }
         }
 
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-
+        private void dataGridView1_CellContentClick(
+            object sender,
+            DataGridViewCellEventArgs e)
         {
-
             if (e.RowIndex >= 0)
             {
-                // Mengambil baris yang diklik
-                DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
+                selectedPertemuanID =
+                    Convert.ToInt32(
+                        ((DataRowView)bs.Current)["PertemuanID"]);
 
-                // 1. Simpan ID Utama untuk keperluan Update/Delete
-                selectedPertemuanID = Convert.ToInt32(row.Cells["PertemuanID"].Value);
-
-                // 2. Isi data ke TextBox dan ComboBox
-                txtNIM.Text = row.Cells["NIM"].Value?.ToString();
-                txtNamaMahasiswa.Text = row.Cells["Mahasiswa"].Value?.ToString();
-                cmbStatus.Text = row.Cells["Status"].Value?.ToString();
-                txtCatatan.Text = row.Cells["CatatanPermintaan"].Value?.ToString();
-
-                // 3. Set ComboBox Dosen berdasarkan nama di Grid
-                // Ini akan memicu event SelectedIndexChanged untuk mengisi cmbJadwal
-                cmbDosen.Text = row.Cells["Dosen"].Value?.ToString();
-
-                // 4. Panggil fungsi CariMahasiswa untuk mendapatkan selectedMahasiswaID yang asli
                 CariMahasiswa();
             }
         }
 
-        
+
 
         private void JadwalPertemuan_Load(object sender, EventArgs e)
         {
+            // GRID
+            dataGridView1.ReadOnly = true;
+
+            dataGridView1.AllowUserToAddRows = false;
+
+            dataGridView1.SelectionMode =
+                DataGridViewSelectionMode.FullRowSelect;
+
+            dataGridView1.MultiSelect = false;
+
+            dataGridView1.AutoSizeColumnsMode =
+                DataGridViewAutoSizeColumnsMode.Fill;
+
+            // BINDING NAVIGATOR
+            bindingNavigator1.BindingSource = bs;
+
+            // STATUS
             cmbStatus.Items.Clear();
-            cmbStatus.Items.AddRange(new string[] { "Pending", "Available", "Denied", "Completed" });
+
+            cmbStatus.Items.AddRange(
+                new string[]
+                {
+            "Pending",
+            "Available",
+            "Denied",
+            "Completed"
+                });
+
             cmbStatus.SelectedIndex = 0;
+
             LoadDosen();
+
             LoadGrid();
         }
 
@@ -261,7 +316,11 @@ namespace CRUDMahasiswaADO
         {
             try
             {
-                SqlDataAdapter da = new SqlDataAdapter("SELECT DosenID, Nama FROM Dosen", conn);
+                SqlCommand cmd = new SqlCommand("sp_GetDosen", conn);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
 
@@ -297,36 +356,37 @@ namespace CRUDMahasiswaADO
         {
             try
             {
-                if (conn.State == ConnectionState.Closed) conn.Open();
+                if (conn.State == ConnectionState.Closed)
+                    conn.Open();
 
-                // Ditambahkan filter: Tanggal >= hari ini agar jadwal lama tidak muncul
-                string query = @"SELECT JadwalID, 
-                                CONVERT(VARCHAR, Tanggal, 105) + ' ' + 
-                                LEFT(CONVERT(VARCHAR, WaktuMulai, 108), 5) + '-' + 
-                                LEFT(CONVERT(VARCHAR, WaktuSelesai, 108), 5) AS Info
-                         FROM JadwalDosen 
-                         WHERE DosenID = @DosenID 
-                         AND Status = 'Available'
-                         AND Tanggal >= CAST(GETDATE() AS DATE)";
+                SqlCommand cmd = new SqlCommand("sp_GetJadwalByDosen", conn);
 
-                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
                 cmd.Parameters.AddWithValue("@DosenID", dosenID);
 
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
+
                 DataTable dt = new DataTable();
+
                 da.Fill(dt);
 
                 if (dt.Rows.Count == 0)
                 {
                     cmbJadwal.DataSource = null;
+
                     cmbJadwal.Items.Clear();
+
                     cmbJadwal.Items.Add("-- Tidak ada jadwal tersedia --");
+
                     cmbJadwal.SelectedIndex = 0;
                 }
                 else
                 {
                     cmbJadwal.DataSource = dt;
+
                     cmbJadwal.DisplayMember = "Info";
+
                     cmbJadwal.ValueMember = "JadwalID";
                 }
             }
@@ -344,6 +404,8 @@ namespace CRUDMahasiswaADO
         private void CariMahasiswa()
         {
             string nim = txtNIM.Text.Trim();
+
+            // Validasi kosong
             if (string.IsNullOrWhiteSpace(nim))
             {
                 txtNamaMahasiswa.Text = "";
@@ -353,29 +415,51 @@ namespace CRUDMahasiswaADO
 
             try
             {
-                if (conn.State == ConnectionState.Closed) conn.Open();
+                // Buka koneksi jika masih tertutup
+                if (conn.State == ConnectionState.Closed)
+                    conn.Open();
 
-                string query = "SELECT MahasiswaID, Nama FROM Mahasiswa WHERE NIM = @NIM";
-                SqlCommand cmd = new SqlCommand(query, conn);
+                // Panggil Stored Procedure
+                SqlCommand cmd = new SqlCommand("sp_GetMahasiswaByNIM", conn);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+
                 cmd.Parameters.AddWithValue("@NIM", nim);
 
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (reader.Read())
+                // Execute Reader
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
-                    selectedMahasiswaID = Convert.ToInt32(reader["MahasiswaID"]);
-                    txtNamaMahasiswa.Text = reader["Nama"].ToString();
+                    if (reader.Read())
+                    {
+                        // Jika mahasiswa ditemukan
+                        selectedMahasiswaID =
+                            Convert.ToInt32(reader["MahasiswaID"]);
+
+                        txtNamaMahasiswa.Text =
+                            reader["Nama"].ToString();
+                    }
+                    else
+                    {
+                        // Jika mahasiswa tidak ditemukan
+                        txtNamaMahasiswa.Text = "Tidak ditemukan";
+
+                        selectedMahasiswaID = 0;
+
+                        MessageBox.Show(
+                            "Mahasiswa dengan NIM " + nim + " tidak ditemukan!",
+                            "Peringatan",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+                    }
                 }
-                else
-                {
-                    txtNamaMahasiswa.Text = "Tidak ditemukan";
-                    selectedMahasiswaID = 0;
-                    MessageBox.Show("Mahasiswa dengan NIM " + nim + " tidak ditemukan!");
-                }
-                reader.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error cari mahasiswa: " + ex.Message);
+                MessageBox.Show(
+                    "Error cari mahasiswa: " + ex.Message,
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 
@@ -421,34 +505,27 @@ namespace CRUDMahasiswaADO
         {
             try
             {
-                if (conn.State == ConnectionState.Closed) conn.Open();
+                if (conn.State == ConnectionState.Closed)
+                    conn.Open();
 
-                // 1. Cek apakah Mahasiswa sudah booking jadwal yang sama
-                string sqlCekMhs = "SELECT COUNT(*) FROM Pertemuan WHERE MahasiswaID = @mID AND JadwalID = @jID";
-                SqlCommand cmdMhs = new SqlCommand(sqlCekMhs, conn);
-                cmdMhs.Parameters.AddWithValue("@mID", mhsID);
-                cmdMhs.Parameters.AddWithValue("@jID", jadwalID);
+                SqlCommand cmd = new SqlCommand("sp_CheckBookingValid", conn);
 
-                if ((int)cmdMhs.ExecuteScalar() > 0)
-                {
-                    MessageBox.Show("Anda sudah mengajukan booking untuk jadwal ini!");
-                    return false;
-                }
+                cmd.CommandType = CommandType.StoredProcedure;
 
-                // 2. Cek apakah jadwal sudah di-booking (Status di JadwalDosen harus Available)
-                string sqlCekStatus = "SELECT Status FROM JadwalDosen WHERE JadwalID = @jID";
-                SqlCommand cmdStatus = new SqlCommand(sqlCekStatus, conn);
-                cmdStatus.Parameters.AddWithValue("@jID", jadwalID);
-                string statusJadwal = cmdStatus.ExecuteScalar()?.ToString();
+                cmd.Parameters.AddWithValue("@MahasiswaID", mhsID);
 
-                if (statusJadwal != "Available")
-                {
-                    MessageBox.Show("Maaf, jadwal ini baru saja penuh atau tidak tersedia lagi.");
-                    return false;
-                }
+                cmd.Parameters.AddWithValue("@JadwalID", jadwalID);
+
+                cmd.ExecuteNonQuery();
+
+                return true;
             }
-            catch (Exception ex) { MessageBox.Show("Error Validasi Booking: " + ex.Message); return false; }
-            return true;
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+
+                return false;
+            }
         }
         private void txtNIM_Leave(object sender, EventArgs e)
         {
@@ -462,6 +539,11 @@ namespace CRUDMahasiswaADO
             txtCatatan.Clear();
             selectedMahasiswaID = 0;
             selectedPertemuanID = 0;
+        }
+
+        private void txtNIM_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
     }

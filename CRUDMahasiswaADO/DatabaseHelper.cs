@@ -4,8 +4,7 @@ namespace CRUDMahasiswaADO
 {
     public static class DatabaseHelper
     {
-        public static readonly string ConnectionString =
-            "Data Source=LAPTOP-49331NDM\\RIANIINDRI;Initial Catalog=DBJadwalKoor;Integrated Security=True";
+        public static readonly string ConnectionString = "Data Source=erlinaaa\\ERLINASHAFIRA;Initial Catalog=DBJadwalKoor;Integrated Security=True";
 
         public static SqlConnection GetConnection()
         {

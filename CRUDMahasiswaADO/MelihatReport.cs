@@ -14,7 +14,7 @@ namespace CRUDMahasiswaADO
 {
     public partial class MelihatReport : Form
     {
-        private readonly string connectionString = "Data Source=LAPTOP-49331NDM\\RIANIINDRI;Initial Catalog=DBJadwalKoor;Integrated Security=True";
+        private readonly string connectionString = "Data Source=erlinaaa\\ERLINASHAFIRA;Initial Catalog=DBJadwalKoor;Integrated Security=True";
 
         private readonly SqlConnection conn;
 

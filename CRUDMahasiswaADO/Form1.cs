@@ -23,7 +23,10 @@ namespace CRUDMahasiswaADO
         public string role;
 
         private readonly SqlConnection conn;
-        private readonly string connectionString = "Data Source=LAPTOP-49331NDM\\RIANIINDRI;Initial Catalog=DBJadwalKoor;Integrated Security=True";
+        private readonly string connectionString = "Data Source=erlinaaa\\ERLINASHAFIRA;Initial Catalog=DBJadwalKoor;Integrated Security=True";
+
+        private BindingSource bs = new BindingSource();
+        private DataTable dtJadwal = new DataTable();
         public FormDosen()
         {
             InitializeComponent();
@@ -56,40 +59,11 @@ namespace CRUDMahasiswaADO
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
-            try
-            {
-                if (conn.State == ConnectionState.Closed)
-                {
-                    conn.Open();
-                }
-
-                // QUERY YANG DIUBAH:
-                string query = @"
-            SELECT j.JadwalID, j.DosenID, d.NIDN, d.Nama, 
-                   j.Tanggal, j.WaktuMulai, j.WaktuSelesai, j.Status
-            FROM JadwalDosen j
-            JOIN Dosen d ON j.DosenID = d.DosenID
-            WHERE j.Tanggal >= CAST(GETDATE() AS DATE) 
-              AND j.Tanggal <= DATEADD(month, 6, GETDATE())
-            ORDER BY j.Tanggal ASC";
-
-                SqlDataAdapter da = new SqlDataAdapter(query, conn);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-
-                dataGridView1.DataSource = dt;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Gagal menampilkan data: " + ex.Message);
-            }
+            LoadData();
         }
 
         private bool Validasi()
         {
-            if (string.IsNullOrWhiteSpace(cmbStatus.Text))
-            { MessageBox.Show("Status harus dipilih!"); cmbStatus.Focus(); return false; }
-
             if (dtpWaktuMulai.Value.TimeOfDay >= dtpWaktuSelesai.Value.TimeOfDay)
             {
                 MessageBox.Show("Logika waktu salah! Waktu selesai harus lebih besar dari waktu mulai.");
@@ -126,21 +100,20 @@ namespace CRUDMahasiswaADO
             {
                 if (conn.State == ConnectionState.Closed) conn.Open();
 
-                string query = @"INSERT INTO JadwalDosen (DosenID, Tanggal, WaktuMulai, WaktuSelesai, Status) 
-                         VALUES (@DosenID, @Tanggal, @Mulai, @Selesai, @Status)";
-                SqlCommand cmd = new SqlCommand(query, conn);
+                SqlCommand cmd = new SqlCommand("sp_InsertJadwalDosen", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
                 cmd.Parameters.AddWithValue("@DosenID", SelectedDosenID);
                 cmd.Parameters.AddWithValue("@Tanggal", dtpTanggalKetersediaan.Value.Date);
                 cmd.Parameters.AddWithValue("@Mulai", dtpWaktuMulai.Value.TimeOfDay);
                 cmd.Parameters.AddWithValue("@Selesai", dtpWaktuSelesai.Value.TimeOfDay);
-                cmd.Parameters.AddWithValue("@Status", cmbStatus.Text);
-
+                cmd.Parameters.AddWithValue("@Lokasi", cmbLokasi.Text);
                 int result = cmd.ExecuteNonQuery();
                 if (result > 0)
                 {
                     MessageBox.Show("Jadwal berhasil ditambahkan!");
                     ClearForm();
-                    btnLoad.PerformClick();
+                    LoadData(); ;
                 }
             }
             catch (Exception ex)
@@ -152,13 +125,9 @@ namespace CRUDMahasiswaADO
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-            if (SelectedDosenID == 0) { MessageBox.Show("Pilih dosen!"); return; }
-            if (!ValidasiLogikaInput()) return;
-
-            // Cek Bentrok
-            if (IsJadwalBentrok(SelectedDosenID, dtpTanggalKetersediaan.Value, dtpWaktuMulai.Value.TimeOfDay, dtpWaktuSelesai.Value.TimeOfDay))
+            if (SelectedDosenID == 0)
             {
-                MessageBox.Show("Dosen sudah memiliki jadwal lain di jam yang bersinggungan!");
+                MessageBox.Show("Pilih dosen!");
                 return;
             }
 
@@ -170,42 +139,47 @@ namespace CRUDMahasiswaADO
 
             if (!Validasi()) return;
 
+            if (!ValidasiLogikaInput()) return;
+
+            // Cek bentrok jadwal
+            if (IsJadwalBentrok(
+                SelectedDosenID,
+                dtpTanggalKetersediaan.Value,
+                dtpWaktuMulai.Value.TimeOfDay,
+                dtpWaktuSelesai.Value.TimeOfDay,
+                SelectedID))
+            {
+                MessageBox.Show("Dosen sudah memiliki jadwal lain di jam yang bersinggungan!");
+                return;
+            }
+
             try
             {
-                if (conn.State == ConnectionState.Closed) conn.Open();
+                if (conn.State == ConnectionState.Closed)
+                    conn.Open();
 
-                string queryDosen = @"UPDATE Dosen 
-                            SET NIDN = @NIDN, 
-                                Nama = @Nama 
-                            WHERE DosenID = @DosenID";
+                SqlCommand cmd = new SqlCommand("sp_UpdateJadwalDosen", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
 
-                SqlCommand cmdDosen = new SqlCommand(queryDosen, conn);
-                cmdDosen.Parameters.AddWithValue("@DosenID", SelectedDosenID);
-                cmdDosen.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@Jid", SelectedID);
+                cmd.Parameters.AddWithValue("@DosenID", SelectedDosenID);
+                cmd.Parameters.AddWithValue("@Tgl", dtpTanggalKetersediaan.Value.Date);
+                cmd.Parameters.AddWithValue("@Mulai", dtpWaktuMulai.Value.TimeOfDay);
+                cmd.Parameters.AddWithValue("@Selesai", dtpWaktuSelesai.Value.TimeOfDay);
+                cmd.Parameters.AddWithValue("@Lokasi", cmbLokasi.Text);
 
-                string queryJadwal = @"UPDATE JadwalDosen 
-                             SET Tanggal = @Tanggal, 
-                                 WaktuMulai = @Mulai, 
-                                 WaktuSelesai = @Selesai, 
-                                 Status = @Status 
-                             WHERE JadwalID = @JadwalID";
-
-                SqlCommand cmdJadwal = new SqlCommand(queryJadwal, conn);
-                cmdJadwal.Parameters.AddWithValue("@Tanggal", dtpTanggalKetersediaan.Value.Date);
-                cmdJadwal.Parameters.AddWithValue("@Mulai", dtpWaktuMulai.Value.TimeOfDay);
-                cmdJadwal.Parameters.AddWithValue("@Selesai", dtpWaktuSelesai.Value.TimeOfDay);
-                cmdJadwal.Parameters.AddWithValue("@Status", cmbStatus.Text);
-                cmdJadwal.Parameters.AddWithValue("@JadwalID", SelectedID);
-
-                int result = cmdJadwal.ExecuteNonQuery();
+                int result = cmd.ExecuteNonQuery();
 
                 if (result > 0)
                 {
                     MessageBox.Show("Data Jadwal Dosen berhasil diperbarui!");
+
                     ClearForm();
+
                     SelectedID = 0;
                     SelectedDosenID = 0;
-                    btnLoad.PerformClick();
+
+                    LoadData();
                 }
                 else
                 {
@@ -220,63 +194,51 @@ namespace CRUDMahasiswaADO
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            if (SelectedID == 0) return;
-
-            // VALIDASI: Jadwal yang sudah Booked tidak boleh dihapus
-            if (cmbStatus.Text == "Booked")
+            if (SelectedID == 0)
             {
-                MessageBox.Show("Jadwal yang sudah berstatus 'Booked' tidak boleh dihapus!", "Akses Ditolak", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                MessageBox.Show("Pilih data dulu di tabel!");
                 return;
             }
 
-            DialogResult res = MessageBox.Show("Apakah anda yakin menghapus jadwal ini?", "Konfirmasi", MessageBoxButtons.YesNo);
-            if (res == DialogResult.Yes)
-            {
-                // ... proses delete kamu ...
-            }
+            DialogResult resultConfirm = MessageBox.Show(
+                "Apakah Anda yakin ingin menghapus data ini?",
+                "Konfirmasi Hapus",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (resultConfirm != DialogResult.Yes)
+                return;
 
             try
             {
-                if (conn.State == System.Data.ConnectionState.Closed)
+                if (conn.State == ConnectionState.Closed)
                 {
                     conn.Open();
-
-                    if (SelectedID == 0)
-                    {
-                        MessageBox.Show("Pilih data dulu di tabel!");
-                        return;
-                    }
                 }
 
-                DialogResult resultConfirm = MessageBox.Show(
-                    "Apakah Anda yakin ingin menghapus data ini?",
-                    "Konfirmasi Hapus",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question);
+                SqlCommand cmd = new SqlCommand("sp_DeleteJadwalDosen", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
 
-                if (resultConfirm == DialogResult.Yes)
+                cmd.Parameters.AddWithValue("@Jid", SelectedID);
+
+                int result = cmd.ExecuteNonQuery();
+
+                if (result > 0)
                 {
-                    string query = "DELETE FROM JadwalDosen WHERE JadwalID = @id";
+                    MessageBox.Show("Data jadwal berhasil dihapus!");
 
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@id", SelectedID);
-                    cmd.Parameters.AddWithValue("@tgl", dtpTanggalKetersediaan.Value.Date);
+                    ClearForm();
 
-                    int result = cmd.ExecuteNonQuery();
+                    SelectedID = 0;
+                    SelectedDosenID = 0;
 
-                    if (result > 0)
-                    {
-                        MessageBox.Show("Data dosen berhasil dihapus");
-                        ClearForm();
-                        btnLoad.PerformClick();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Gagal menghapus data");
-                    }
+                    LoadData();
+                }
+                else
+                {
+                    MessageBox.Show("Gagal menghapus data.");
                 }
             }
-
             catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message);
@@ -292,8 +254,6 @@ namespace CRUDMahasiswaADO
                 SelectedID = Convert.ToInt32(row.Cells["JadwalID"].Value);
                 SelectedDosenID = Convert.ToInt32(row.Cells["DosenID"].Value);
 
-                cmbStatus.Text = row.Cells["Status"].Value?.ToString();
-
                 if (row.Cells["Tanggal"].Value != DBNull.Value)
                     dtpTanggalKetersediaan.Value = Convert.ToDateTime(row.Cells["Tanggal"].Value);
 
@@ -303,6 +263,8 @@ namespace CRUDMahasiswaADO
                 if (row.Cells["WaktuSelesai"].Value != DBNull.Value)
                     dtpWaktuSelesai.Value = DateTime.Today.Add((TimeSpan)row.Cells["WaktuSelesai"].Value);
 
+                cmbLokasi.Text =
+                    row.Cells["Lokasi"].Value?.ToString();
 
             }
         }
@@ -316,7 +278,6 @@ namespace CRUDMahasiswaADO
             dtpTanggalKetersediaan.Value = DateTime.Now;
             dtpWaktuMulai.Value = DateTime.Now;
             dtpWaktuSelesai.Value = DateTime.Now;
-            cmbStatus.SelectedIndex = 0;
         }
 
         private void FormDosen_Load(object sender, EventArgs e)
@@ -324,49 +285,55 @@ namespace CRUDMahasiswaADO
             dataGridView1.ReadOnly = true;
             dataGridView1.AllowUserToAddRows = false;
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dataGridView1.MultiSelect = false;
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
-            cmbStatus.Items.Clear();
-            cmbStatus.Items.Add("Available");
-            cmbStatus.Items.Add("Unavailable");
-            cmbStatus.Items.Add("Booked");
-            cmbStatus.SelectedIndex = 0;
+            bindingNavigator1.BindingSource = bs;
 
-            LoadDosen(); // ← tambahkan ini
+            // COMBOBOX LOKASI
+            cmbLokasi.Items.Clear();
+
+            cmbLokasi.Items.Add("Ruang Dosen");
+
+            cmbLokasi.Items.Add("Lab UI/UX");
+
+            cmbLokasi.Items.Add("Lab Networking");
+
+            cmbLokasi.Items.Add("Lab Data");
+
+            cmbLokasi.Items.Add("Lab Pemrograman");
+
+            cmbLokasi.SelectedIndex = 0;
+
+            LoadDosen();
 
             dtpTanggalKetersediaan.Value = DateTime.Now;
+            // RANGE TANGGAL AMAN UNTUK BINDING 😭🔥
+            dtpTanggalKetersediaan.MinDate =
+                new DateTime(2020, 1, 1);
+
+            dtpTanggalKetersediaan.MaxDate =
+                DateTime.Today.AddYears(5);
+
             dtpWaktuMulai.Value = DateTime.Now;
             dtpWaktuSelesai.Value = DateTime.Now;
 
-            btnLoad.PerformClick();
+            dtpWaktuMulai.Format = DateTimePickerFormat.Custom;
+            dtpWaktuMulai.CustomFormat = "HH:mm";
+            dtpWaktuMulai.ShowUpDown = true;
+
+            dtpWaktuSelesai.Format = DateTimePickerFormat.Custom;
+            dtpWaktuSelesai.CustomFormat = "HH:mm";
+            dtpWaktuSelesai.ShowUpDown = true;
+
+            LoadData();
         }
 
         private void cmbJK_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }
-        private void FormDosen_Load_1(object sender, EventArgs e)
-        {
-            try
-            {
-                if (conn.State == ConnectionState.Closed) conn.Open();
-
-                string query = "SELECT DosenID, NIDN, Nama FROM Dosen ORDER BY Nama";
-                SqlDataAdapter da = new SqlDataAdapter(query, conn);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-
-                dtpTanggalKetersediaan.MinDate = DateTime.Today;
-                dtpTanggalKetersediaan.MaxDate = DateTime.Today.AddMonths(6);
-
-                cmbDosen.DataSource = dt;
-                cmbDosen.DisplayMember = "Nama";   // yang ditampilkan
-                cmbDosen.ValueMember = "DosenID";  // yang disimpan sebagai value
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Gagal load dosen: " + ex.Message);
-            }
-        }
+        
 
         private void LoadDosen()
         {
@@ -407,8 +374,25 @@ namespace CRUDMahasiswaADO
 
         private bool ValidasiLogikaInput()
         {
+            if (dtpTanggalKetersediaan.Value.Date < DateTime.Today)
+            {
+                MessageBox.Show("Tanggal tidak boleh kurang dari hari ini!");
+                return false;
+            }
+
+            // Maksimal 6 bulan ke depan
+            if (dtpTanggalKetersediaan.Value.Date >
+                DateTime.Today.AddMonths(6))
+            {
+                MessageBox.Show(
+                    "Jadwal maksimal hanya boleh 6 bulan dari hari ini!");
+
+                return false;
+            }
+
             TimeSpan mulai = dtpWaktuMulai.Value.TimeOfDay;
             TimeSpan selesai = dtpWaktuSelesai.Value.TimeOfDay;
+
             TimeSpan jamMasuk = new TimeSpan(7, 0, 0);  // 07:00
             TimeSpan jamPulang = new TimeSpan(17, 0, 0); // 17:00
 
@@ -466,6 +450,63 @@ namespace CRUDMahasiswaADO
             return bentrok;
         }
 
+        private void LoadData()
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    string query = "SELECT * FROM View_JadwalDosenFull";
+
+                    using (SqlDataAdapter da = new SqlDataAdapter(query, conn))
+                    {
+                        dtJadwal = new DataTable();
+
+                        da.Fill(dtJadwal);
+
+                        bs.DataSource = dtJadwal;
+
+                        dataGridView1.DataSource = bs;
+
+                        BindControls();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Gagal load data: " + ex.Message);
+            }
+        }
+
+            private void BindControls()
+        {
+            txtNIDN.DataBindings.Clear();
+            cmbDosen.DataBindings.Clear();
+
+            dtpTanggalKetersediaan.DataBindings.Clear();
+            dtpWaktuMulai.DataBindings.Clear();
+            dtpWaktuSelesai.DataBindings.Clear();
+
+            txtNIDN.DataBindings.Add("Text", bs, "NIDN");
+
+            cmbDosen.DataBindings.Add("Text", bs, "NamaDosen");
+
+            dtpTanggalKetersediaan.DataBindings.Add("Value", bs, "Tanggal");
+
+            cmbLokasi.DataBindings.Clear();
+        }
+
+        private void bindingNavigator2_RefreshItems(object sender, EventArgs e)
+        {
+
+        }
+
+        private void cmbLokasi_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+    }
 
     }
-}
