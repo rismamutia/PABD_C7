@@ -1,6 +1,5 @@
 CREATE DATABASE DBJadwalKoor;
 GO
-DROP DATABASE DBJadwalKoor;
 
 USE DBJadwalKoor;
 GO
@@ -39,6 +38,9 @@ CREATE TABLE JadwalDosen (
     CONSTRAINT CK_Waktu CHECK (WaktuMulai < WaktuSelesai)
 );
 
+Status VARCHAR(20) NOT NULL DEFAULT 'Available'
+CHECK (Status IN ('Available', 'Booked'));
+
 CREATE TABLE Pertemuan (
     PertemuanID INT IDENTITY(1,1) PRIMARY KEY,
     JadwalID INT NOT NULL,
@@ -51,7 +53,6 @@ CREATE TABLE Pertemuan (
     FOREIGN KEY (MahasiswaID) REFERENCES Mahasiswa(MahasiswaID)
 );
 
-DROP TABLE Pertemuan;
 
 CREATE TABLE RiwayatKonsultasi (
     RiwayatID INT IDENTITY(1,1) PRIMARY KEY,
@@ -171,31 +172,7 @@ FROM JadwalDosen j
 JOIN Dosen d ON j.DosenID = d.DosenID;
 GO
 
-ALTER PROCEDURE sp_InsertJadwalDosen
-    @DosenID INT,
-    @Tanggal DATE,
-    @Mulai TIME,
-    @Selesai TIME,
-    @Status VARCHAR(20),
-	@Lokasi VARCHAR(100)
-AS
-BEGIN
-    -- Logika Tambahan: Cek apakah dosen sudah punya jadwal di jam yang sama
-    IF EXISTS (SELECT 1 FROM JadwalDosen 
 
-               WHERE DosenID = @DosenID AND Tanggal = @Tanggal 
-               AND ((@Mulai >= WaktuMulai AND @Mulai < WaktuSelesai) 
-               OR (@Selesai > WaktuMulai AND @Selesai <= WaktuSelesai)))
-    BEGIN
-        RAISERROR('Dosen tersebut sudah memiliki jadwal pada jam yang bersinggungan!', 16, 1);
-    END
-    ELSE
-    BEGIN
-        INSERT INTO JadwalDosen (DosenID, Tanggal, WaktuMulai, WaktuSelesai, Status, Lokasi)
-        VALUES (@DosenID, @Tanggal, @Mulai, @Selesai, @Status, @Lokasi);
-    END
-END;
-GO
 CREATE PROCEDURE sp_DeleteJadwalDosen
     @JadwalID INT
 AS
@@ -246,18 +223,20 @@ FROM Dosen;
 GO
 
 --- 3. View Jadwal Dosen
-CREATE VIEW View_JadwalDosenFull AS
-SELECT 
-    j.JadwalID, 
-    j.DosenID, 
-    d.Nama AS NamaDosen, 
+ALTER VIEW View_JadwalDosenFull
+AS
+SELECT
+    j.JadwalID,
+    d.DosenID,
     d.NIDN,
-    j.Tanggal, 
-    j.WaktuMulai, 
-    j.WaktuSelesai, 
-    j.Status
+    d.Nama AS NamaDosen,
+    j.Tanggal,
+    j.WaktuMulai,
+    j.WaktuSelesai,
+    j.Lokasi
 FROM JadwalDosen j
-JOIN Dosen d ON j.DosenID = d.DosenID;
+JOIN Dosen d
+ON j.DosenID = d.DosenID;
 GO
 
 --- 4. View Booking Pertemuan
@@ -423,24 +402,69 @@ GO
 === STORED PROCEDURE - JADWAL DOSEN ===
 */
 -- INSERT JADWAL DOSEN 
-GO
 ALTER PROCEDURE sp_InsertJadwalDosen
-    @DosenID INT, @Tgl DATE, @Mulai TIME, @Selesai TIME
+    @DosenID INT,
+    @Tanggal DATE,
+    @Mulai TIME,
+    @Selesai TIME,
+    @Lokasi VARCHAR(100)
 AS
 BEGIN
-    -- Isi logikanya tetap sama --
-    IF (@Mulai >= @Selesai)
-        RAISERROR('Waktu mulai tidak boleh setelah waktu selesai!', 16, 1);
-    ELSE IF EXISTS (SELECT 1 FROM JadwalDosen 
-                    WHERE DosenID = @DosenID AND Tanggal = @Tgl 
-                    AND ((@Mulai >= WaktuMulai AND @Mulai < WaktuSelesai) 
-                    OR (@Selesai > WaktuMulai AND @Selesai <= WaktuSelesai)))
-        RAISERROR('Gagal: Dosen sudah punya jadwal di jam tersebut!', 16, 1);
-    ELSE
-        INSERT INTO JadwalDosen (DosenID, Tanggal, WaktuMulai, WaktuSelesai, Status)
-        VALUES (@DosenID, @Tgl, @Mulai, @Selesai, 'Available');
+
+    IF EXISTS
+    (
+        SELECT 1
+        FROM JadwalDosen
+        WHERE
+            DosenID = @DosenID
+            AND Tanggal = @Tanggal
+            AND
+            (
+                (@Mulai >= WaktuMulai
+                 AND @Mulai < WaktuSelesai)
+
+                OR
+
+                (@Selesai > WaktuMulai
+                 AND @Selesai <= WaktuSelesai)
+
+                OR
+
+                (WaktuMulai >= @Mulai
+                 AND WaktuMulai < @Selesai)
+            )
+    )
+    BEGIN
+        RAISERROR(
+            'Dosen sudah memiliki jadwal bentrok!',
+            16,
+            1
+        );
+        RETURN;
+    END
+
+    INSERT INTO JadwalDosen
+    (
+        DosenID,
+        Tanggal,
+        WaktuMulai,
+        WaktuSelesai,
+        Status,
+        Lokasi
+    )
+    VALUES
+    (
+        @DosenID,
+        @Tanggal,
+        @Mulai,
+        @Selesai,
+        'Available',
+        @Lokasi
+    );
+
 END;
-GO 
+GO
+
 
 -- UPDATE JADWAL DOSEN 
 ALTER PROCEDURE sp_UpdateJadwalDosen
@@ -449,25 +473,24 @@ ALTER PROCEDURE sp_UpdateJadwalDosen
     @Tgl DATE,
     @Mulai TIME,
     @Selesai TIME,
-    @Status VARCHAR(20),
     @Lokasi VARCHAR(100)
 AS
 BEGIN
 
-    -- Validasi 1
+    -- Tidak boleh edit jika sudah booked
     IF (SELECT Status
         FROM JadwalDosen
         WHERE JadwalID = @Jid) = 'Booked'
     BEGIN
         RAISERROR(
-            'Gagal: Jadwal sudah dibooking!',
+            'Jadwal sudah dibooking!',
             16,
             1
         );
         RETURN;
     END
 
-    -- Validasi 2
+    -- Validasi waktu
     IF (@Mulai >= @Selesai)
     BEGIN
         RAISERROR(
@@ -478,7 +501,7 @@ BEGIN
         RETURN;
     END
 
-    -- Validasi 3
+    -- Validasi bentrok
     IF EXISTS
     (
         SELECT 1
@@ -512,7 +535,6 @@ BEGIN
         Tanggal = @Tgl,
         WaktuMulai = @Mulai,
         WaktuSelesai = @Selesai,
-        Status = @Status,
         Lokasi = @Lokasi
     WHERE JadwalID = @Jid;
 
@@ -538,47 +560,19 @@ END;
 GO
 
 -- SEARCH JADWAL DOSEN 
-GO
 ALTER PROCEDURE sp_SearchJadwalDosen
     @Keyword VARCHAR(100)
 AS
 BEGIN
-    -- Mengambil data dari VIEW (Poin 2 UCP: Query Select diubah menjadi VIEW)
-    SELECT * FROM View_JadwalDosenFull
-    WHERE NamaDosen LIKE '%' + @Keyword + '%' 
-       OR NIDN LIKE '%' + @Keyword + '%'
-       OR Status LIKE '%' + @Keyword + '%';
-END;
-GO
 
-/*
-=== STORED PROCEDURE - BOOKING ===
-*/
--- INSERT BOOKING 
-GO
-CREATE PROCEDURE sp_InsertBooking
-    @Jid INT, 
-    @Mid INT, 
-    @Catatan VARCHAR(MAX)
-AS
-BEGIN
-    BEGIN TRANSACTION;
-    BEGIN TRY
-        -- Logika kamu di sini...
-        IF (SELECT Status FROM JadwalDosen WHERE JadwalID = @Jid) <> 'Available'
-            THROW 50000, 'Jadwal sudah tidak tersedia!', 1;
+    SELECT *
+    FROM View_JadwalDosenFull
 
-        INSERT INTO Pertemuan (JadwalID, MahasiswaID, Status, CatatanPermintaan)
-        VALUES (@Jid, @Mid, 'Pending', @Catatan);
+    WHERE
+        NamaDosen LIKE '%' + @Keyword + '%'
+        OR NIDN LIKE '%' + @Keyword + '%'
+        OR Lokasi LIKE '%' + @Keyword + '%';
 
-        UPDATE JadwalDosen SET Status = 'Booked' WHERE JadwalID = @Jid;
-
-        COMMIT TRANSACTION;
-    END TRY
-    BEGIN CATCH
-        ROLLBACK TRANSACTION;
-        THROW;
-    END CATCH
 END;
 GO
 
@@ -768,43 +762,6 @@ BEGIN
 END;
 GO
 
-CREATE VIEW View_JadwalDosenLokasi
-AS
-SELECT
-    j.JadwalID,
-    d.DosenID,
-    d.NIDN,
-    d.Nama AS NamaDosen,
-    j.Tanggal,
-    j.WaktuMulai,
-    j.WaktuSelesai,
-    j.Status,
-    j.Lokasi
-FROM JadwalDosen j
-JOIN Dosen d
-ON j.DosenID = d.DosenID;
-GO
-
-CREATE PROCEDURE sp_GetJadwalDosenLokasi
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    SELECT
-        JadwalID,
-        DosenID,
-        NIDN,
-        NamaDosen,
-        Tanggal,
-        WaktuMulai,
-        WaktuSelesai,
-        Status,
-        Lokasi
-    FROM View_JadwalDosenLokasi
-    ORDER BY Tanggal ASC;
-END;
-GO
-
 --SELECT BY NIM
 
 CREATE PROCEDURE sp_GetBookingByNIM
@@ -912,61 +869,6 @@ BEGIN
 END;
 GO
 
-CREATE PROCEDURE sp_DeleteBooking
-    @Pid INT
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    BEGIN TRANSACTION;
-
-    BEGIN TRY
-
-        DECLARE @Jid INT;
-
-        -- Ambil JadwalID
-        SELECT @Jid = JadwalID
-        FROM Pertemuan
-        WHERE PertemuanID = @Pid;
-
-        -- Hapus booking
-        DELETE FROM Pertemuan
-        WHERE PertemuanID = @Pid;
-
-        -- Kembalikan status jadwal
-        UPDATE JadwalDosen
-        SET Status = 'Available'
-        WHERE JadwalID = @Jid;
-
-        COMMIT TRANSACTION;
-
-    END TRY
-
-    BEGIN CATCH
-
-        ROLLBACK TRANSACTION;
-
-        THROW;
-
-    END CATCH
-END;
-GO
-
-CREATE PROCEDURE sp_SearchBooking
-    @Keyword VARCHAR(100)
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    SELECT *
-    FROM View_BookingPertemuan
-    WHERE
-        NIM_Mahasiswa LIKE '%' + @Keyword + '%'
-        OR Nama_Mahasiswa LIKE '%' + @Keyword + '%'
-        OR Nama_Dosen LIKE '%' + @Keyword + '%'
-        OR Status_Booking LIKE '%' + @Keyword + '%';
-END;
-GO
 
 CREATE PROCEDURE sp_CountBooking
     @Total INT OUTPUT
@@ -1040,23 +942,7 @@ GO
 -- tes sp jadwal booking
 EXEC sp_GetBooking
 
-EXEC sp_InsertBooking
-    @Jid = 1,
-    @Mid = 1,
-    @Catatan = 'Konsultasi DPA'
 
-EXEC sp_InsertBooking
-    @Jid = 1,
-    @Mid = 1,
-    @Catatan = 'Tes'
-
-EXEC sp_UpdateBooking
-    @Pid = 1,
-    @Status = 'Completed',
-    @Catatan = 'Sudah selesai'
-
-EXEC sp_DeleteBooking
-    @Pid = 1
 
 ALTER PROCEDURE sp_GetBooking
 AS
@@ -1077,12 +963,53 @@ BEGIN
 END;
 GO
 
+ALTER PROCEDURE sp_GetJadwalByDosen
+    @DosenID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-ALTER TABLE JadwalDosen
-ADD Lokasi VARCHAR(100);
+    SELECT
+        JadwalID,
+        CONVERT(VARCHAR, Tanggal, 105) + ' ' +
+        LEFT(CONVERT(VARCHAR, WaktuMulai, 108), 5)
+        + '-' +
+        LEFT(CONVERT(VARCHAR, WaktuSelesai, 108), 5)
+        AS Info
+    FROM JadwalDosen
+    WHERE DosenID = @DosenID;
+END;
 
-EXEC sp_GetJadwalDosenLokasi
+ALTER PROCEDURE sp_GetJadwalByDosen
+    @DosenID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        JadwalID,
+        CONVERT(VARCHAR, Tanggal, 105) + ' ' +
+        LEFT(CONVERT(VARCHAR, WaktuMulai, 108), 5)
+        + '-' +
+        LEFT(CONVERT(VARCHAR, WaktuSelesai, 108), 5)
+        AS Info
+    FROM JadwalDosen
+    WHERE
+        DosenID = @DosenID
+        AND Status = 'Available';
+END;
+GO
+
+SELECT
+    JadwalID,
+    DosenID,
+    Tanggal,
+    WaktuMulai,
+    WaktuSelesai,
+    Status
+FROM JadwalDosen
+WHERE DosenID = 3
 
 UPDATE JadwalDosen
-SET Lokasi = 'Ruang Dosen'
-WHERE Lokasi IS NULL;
+SET Status = 'Available'
+WHERE DosenID = 3

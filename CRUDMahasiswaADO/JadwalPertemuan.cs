@@ -324,31 +324,35 @@ namespace CRUDMahasiswaADO
                 DataTable dt = new DataTable();
                 da.Fill(dt);
 
-                // ATUR INI DULU
                 cmbDosen.DisplayMember = "Nama";
                 cmbDosen.ValueMember = "DosenID";
 
-                // BARU ISI DATANYA
                 cmbDosen.DataSource = dt;
+                cmbDosen.SelectedIndex = -1;
             }
             catch (Exception ex) { MessageBox.Show("Error Dosen: " + ex.Message); }
         }
 
         private void cmbDosen_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cmbDosen.SelectedValue is int dosenID)
+            if (cmbDosen.SelectedValue == null)
+                return;
+
+            if (cmbDosen.SelectedValue is DataRowView)
+                return;
+
+            int dosenID = Convert.ToInt32(cmbDosen.SelectedValue);
+
+            if (dosenID == 0)
             {
-                if (dosenID == 0)
-                {
-                    cmbJadwal.DataSource = null;
-                    cmbJadwal.Items.Clear();
-                    cmbJadwal.Items.Add("-- Pilih dosen dulu --");
-                    cmbJadwal.SelectedIndex = 0;
-                }
-                else
-                {
-                    LoadJadwalByDosen(dosenID);
-                }
+                cmbJadwal.DataSource = null;
+                cmbJadwal.Items.Clear();
+                cmbJadwal.Items.Add("-- Pilih dosen dulu --");
+                cmbJadwal.SelectedIndex = 0;
+            }
+            else
+            {
+                LoadJadwalByDosen(dosenID);
             }
         }
 
@@ -542,6 +546,11 @@ namespace CRUDMahasiswaADO
         }
 
         private void txtNIM_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void cmbJadwal_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }

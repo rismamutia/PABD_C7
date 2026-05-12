@@ -255,6 +255,7 @@
             this.cmbJadwal.Name = "cmbJadwal";
             this.cmbJadwal.Size = new System.Drawing.Size(168, 21);
             this.cmbJadwal.TabIndex = 23;
+            this.cmbJadwal.SelectedIndexChanged += new System.EventHandler(this.cmbJadwal_SelectedIndexChanged);
             // 
             // label1
             // 
