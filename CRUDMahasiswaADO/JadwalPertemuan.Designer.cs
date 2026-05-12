@@ -206,7 +206,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(269, 103);
+            this.label8.Location = new System.Drawing.Point(268, 47);
             this.label8.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(91, 13);
@@ -215,7 +215,7 @@
             // 
             // txtNamaMahasiswa
             // 
-            this.txtNamaMahasiswa.Location = new System.Drawing.Point(271, 118);
+            this.txtNamaMahasiswa.Location = new System.Drawing.Point(271, 63);
             this.txtNamaMahasiswa.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtNamaMahasiswa.Name = "txtNamaMahasiswa";
             this.txtNamaMahasiswa.Size = new System.Drawing.Size(168, 20);
@@ -246,7 +246,7 @@
             // cmbJadwal
             // 
             this.cmbJadwal.FormattingEnabled = true;
-            this.cmbJadwal.Location = new System.Drawing.Point(272, 156);
+            this.cmbJadwal.Location = new System.Drawing.Point(271, 118);
             this.cmbJadwal.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.cmbJadwal.Name = "cmbJadwal";
             this.cmbJadwal.Size = new System.Drawing.Size(168, 21);
@@ -265,7 +265,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(269, 141);
+            this.label2.Location = new System.Drawing.Point(268, 103);
             this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(106, 13);
