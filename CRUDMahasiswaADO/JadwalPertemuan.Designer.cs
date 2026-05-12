@@ -175,13 +175,14 @@
             // 
             // btnDelete
             // 
+            this.btnDelete.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
             this.btnDelete.Location = new System.Drawing.Point(486, 144);
             this.btnDelete.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(105, 23);
             this.btnDelete.TabIndex = 15;
             this.btnDelete.Text = "Menghapus Data";
-            this.btnDelete.UseVisualStyleBackColor = true;
+            this.btnDelete.UseVisualStyleBackColor = false;
             this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
             // label7
