@@ -14,7 +14,7 @@ namespace CRUDMahasiswaADO
 {
     public partial class JadwalPertemuan : Form
     {
-        private readonly string connectionString = "Data Source=erlinaaa\\ERLINASHAFIRA;Initial Catalog=DBJadwalKoor;Integrated Security=True";
+        static string connectionString = "Data Source=erlinaaa\\ERLINASHAFIRA;Initial Catalog=DBJadwalKoor;Integrated Security=True";
         private readonly SqlConnection conn;
 
         private int selectedMahasiswaID = 0;
@@ -153,13 +153,17 @@ namespace CRUDMahasiswaADO
 
                 LoadJadwalByDosen((int)cmbDosen.SelectedValue);
             }
-            catch (Exception ex) 
-            { 
-                MessageBox.Show("Gagal: " + ex.Message); 
+            catch (SqlException ex)
+            {
+                SimpanLog(ex.Message);
+                MessageBox.Show("SQL Error : " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                SimpanLog(ex.Message);
+                MessageBox.Show("General Error : " + ex.Message);
             }
         }
-
-
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
@@ -197,9 +201,18 @@ namespace CRUDMahasiswaADO
                     MessageBox.Show("Data berhasil diperbarui!");
                     LoadGrid();
                 }
-                catch (Exception ex) 
-                { 
-                    MessageBox.Show("Gagal Update: " + ex.Message); 
+                catch (SqlException ex)
+                {
+                    SimpanLog("JadwalPertemuan - Update : " + ex.Message);
+
+                    MessageBox.Show("SQL Error : " + ex.Message);
+                }
+
+                catch (Exception ex)
+                {
+                    SimpanLog("JadwalPertemuan - Update : " + ex.Message);
+
+                    MessageBox.Show("General Error : " + ex.Message);
                 }
             }
         }
@@ -245,9 +258,21 @@ namespace CRUDMahasiswaADO
                     LoadGrid();
                     ClearForm();
                 }
-                catch (Exception ex) { MessageBox.Show("Hapus Gagal: " + ex.Message); }
+                catch (SqlException ex)
+                {
+                    SimpanLog("JadwalPertemuan - Delete : " + ex.Message);
+
+                    MessageBox.Show("SQL Error : " + ex.Message);
+                }
+
+                catch (Exception ex)
+                {
+                    SimpanLog("JadwalPertemuan - Delete : " + ex.Message);
+
+                    MessageBox.Show("General Error : " + ex.Message);
+                }
             }
-        }
+            }
 
         private void dataGridView1_CellContentClick(
             object sender,
@@ -524,9 +549,20 @@ namespace CRUDMahasiswaADO
 
                 return true;
             }
+            catch (SqlException ex)
+            {
+                SimpanLog("JadwalPertemuan - Validasi Booking : " + ex.Message);
+
+                MessageBox.Show("SQL Error : " + ex.Message);
+
+                return false;
+            }
+
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                SimpanLog("JadwalPertemuan - Validasi Booking : " + ex.Message);
+
+                MessageBox.Show("General Error : " + ex.Message);
 
                 return false;
             }
@@ -554,6 +590,34 @@ namespace CRUDMahasiswaADO
         {
 
         }
+
+        private void SimpanLog(string pesan)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = @"INSERT INTO LogError
+                        VALUES(GETDATE(), @pesan)";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@pesan", pesan);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+
+            }
+        }
+
+        private void btnRekapData_Click(object sender, EventArgs e)
+        {
+            rekapData fm3 = new rekapData();
+            fm3.Show();
+            this.Hide();
+
+
+        }
     }
-    }
+ }
+  
 

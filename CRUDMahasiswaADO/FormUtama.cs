@@ -28,14 +28,12 @@ namespace CRUDMahasiswaADO
             ToolStripMenuItem mnuDosen = new ToolStripMenuItem("Kelola Dosen"); 
             ToolStripMenuItem mnuJadwal = new ToolStripMenuItem("Kelola Jadwal Dosen");
             ToolStripMenuItem mnuPertemuan = new ToolStripMenuItem("Kelola Jadwal Pertemuan");
-            ToolStripMenuItem mnuReport = new ToolStripMenuItem("Report Pertemuan");
             ToolStripMenuItem mnuKeluar = new ToolStripMenuItem("Keluar");
 
             mnuMhs.Click += (s, e) => BukaForm(new FormMahasiswa());
             mnuDosen.Click += (s, e) => BukaForm(new FormDataDosen());
             mnuJadwal.Click += (s, e) => BukaForm(new FormDosen());
             mnuPertemuan.Click += (s, e) => BukaForm(new JadwalPertemuan());
-            mnuReport.Click += (s, e) => BukaForm(new MelihatReport());
             mnuKeluar.Click += (s, e) => {
                 if (MessageBox.Show("Yakin ingin keluar?", "Konfirmasi",
                     MessageBoxButtons.YesNo) == DialogResult.Yes)
@@ -43,7 +41,7 @@ namespace CRUDMahasiswaADO
             };
 
             mnuData.DropDownItems.AddRange(new ToolStripItem[] {
-                mnuMhs, mnuDosen, mnuJadwal, mnuPertemuan, mnuReport,
+                mnuMhs, mnuDosen, mnuJadwal, mnuPertemuan,
                 new ToolStripSeparator(), mnuKeluar
             });
 

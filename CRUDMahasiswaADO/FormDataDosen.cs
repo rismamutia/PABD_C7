@@ -57,38 +57,46 @@ namespace CRUDMahasiswaADO
 
         private void btnInsert_Click(object sender, EventArgs e)
         {
-            if (!Validasi()) return;
+            SqlConnection conn =
+                new SqlConnection(connectionString);
+
+            conn.Open();
+
+            SqlTransaction trans =
+                conn.BeginTransaction();
 
             try
             {
-                if (conn.State == ConnectionState.Closed)
-                {
-                    conn.Open();
-                }
-
-                SqlCommand cmd = new SqlCommand("sp_InsertDosen", conn);
+                SqlCommand cmd = new SqlCommand("sp_InsertMahasiswa", conn, trans);
                 cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@NIDN", txtNIDN.Text);
+                cmd.Parameters.AddWithValue("@Nama", txtNama.Text);
+                cmd.Parameters.AddWithValue("@Email", txtEmail.Text);
 
-                cmd.Parameters.AddWithValue("@NIDN", txtNIDN.Text.Trim());
-                cmd.Parameters.AddWithValue("@Nama", txtNama.Text.Trim());
-                cmd.Parameters.AddWithValue("@Email", txtEmail.Text.Trim().ToLower());
+                cmd.ExecuteNonQuery();
 
-                int result = cmd.ExecuteNonQuery();
+                SqlCommand cmdLog = new SqlCommand("INSERT INTO LogError (Waktu, Pesan) VALUES (GETDATE(), 'Data dosen berhasil ditambahkan')", conn, trans);
+                cmdLog.ExecuteNonQuery();
 
-                if (result > 0)
-                {
-                    MessageBox.Show("Data Dosen berhasil ditambahkan");
-                    ClearForm();
-                    btnLoad.PerformClick();
-                }
-                else
-                {
-                    MessageBox.Show("Data gagal ditambahkan");
-                }
+                trans.Commit();
+                MessageBox.Show("Data dosen berhasil ditambahkan!");
+                LoadData();
+            }
+            catch (SqlException ex)
+            {
+                trans.Rollback();
+                SimpanLog("ROLLBACK INSERT : " + ex.Message);
+                MessageBox.Show("Error: " + ex.Message);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
+                trans.Rollback();
+                SimpanLog("GENERAL ERROR : " + ex.Message);
+                MessageBox.Show("Error: " + ex.Message);
+            }
+            finally
+            {
+                conn.Close();
             }
         }
 
@@ -325,6 +333,24 @@ namespace CRUDMahasiswaADO
             txtNIDN.DataBindings.Add("Text", bs, "NIDN");
             txtNama.DataBindings.Add("Text", bs, "Nama");
             txtEmail.DataBindings.Add("Text", bs, "Email");
+        }
+
+        private void SimpanLog(string pesan)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = @"INSERT INTO LogError
+                        VALUES(GETDATE(), @pesan)";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@pesan", pesan);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+
+            }
         }
     }
 }

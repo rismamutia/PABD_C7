@@ -1013,3 +1013,273 @@ WHERE DosenID = 3
 UPDATE JadwalDosen
 SET Status = 'Available'
 WHERE DosenID = 3
+
+ALTER TABLE Admin
+ADD Username VARCHAR(50);
+
+UPDATE Admin
+SET Username = 'admin'
+WHERE AdminID = 1;
+
+UPDATE Admin
+SET Username = 'admin2'
+WHERE AdminID = 2;
+
+CREATE TABLE LogError
+(
+	id_log INT IDENTITY(1,1)PRIMARY KEY,
+	waktu DATETIME,
+	pesan_error VARCHAR(MAX)
+);
+
+CREATE TABLE LogAktivitas
+(
+	id_log INT IDENTITY(1,1),
+	aktivitas VARCHAR(100),
+	waktu DATETIME
+);
+
+CREATE TRIGGER trg_InsertMahasiswa
+ON Mahasiswa
+AFTER INSERT
+AS
+BEGIN
+	INSERT INTO LogAktivitas
+	VALUES('Tambah data mahasiswa', GETDATE());
+END;
+
+CREATE TRIGGER trg_DeleteMahasiswa
+ON Mahasiswa
+AFTER INSERT
+AS
+BEGIN
+	INSERT INTO LogAktivitas
+	VALUES('Hapus data mahasiswa', GETDATE());
+END;
+
+CREATE TABLE LogKeamanan
+(
+	id_log INT IDENTITY(1,1),
+	aktivitas VARCHAR(200),
+	jumlah_data INT,
+	waktu DATETIME
+);
+
+CREATE TRIGGER trg_PreventMassUpdate
+ON Mahasiswa
+AFTER UPDATE
+AS
+BEGIN
+	DECLARE @jumlah INT;
+
+	SELECT @jumlah = COUNT(*) FROM inserted;
+	IF @jumlah > 5
+	BEGIN
+		INSERT INTO LogKeamanan
+		VALUES(
+			'WARNING : Update massal terdeteksi',
+			@jumlah,
+			GETDATE()
+		);
+
+		ROLLBACK TRANSACTION;
+
+		RAISERROR(
+		'Update dibatalkan! Terlalu banyak data diubah.',
+		16,
+		1
+		);
+	END
+END;
+
+SELECT * FROM LogError;
+
+CREATE PROCEDURE sp_ReportPertemuan
+    @DosenID INT = NULL,
+    @Status VARCHAR(20) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        m.NIM,
+        m.Nama AS NamaMahasiswa,
+        d.Nama AS NamaDosen,
+        jd.Tanggal,
+        jd.WaktuMulai,
+        jd.WaktuSelesai,
+        p.Status,
+        p.CatatanPermintaan
+    FROM Pertemuan p
+    JOIN Mahasiswa m
+        ON p.MahasiswaID = m.MahasiswaID
+    JOIN JadwalDosen jd
+        ON p.JadwalID = jd.JadwalID
+    JOIN Dosen d
+        ON jd.DosenID = d.DosenID
+
+    WHERE
+    (@DosenID IS NULL OR d.DosenID = @DosenID)
+    AND
+    (@Status IS NULL OR p.Status = @Status)
+
+    ORDER BY jd.Tanggal DESC;
+END;
+GO
+
+ALTER PROCEDURE sp_ReportPertemuan
+    @DosenID INT = NULL,
+    @Status VARCHAR(20) = NULL,
+    @Tanggal DATE = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        m.NIM AS NIM_Mahasiswa,
+        m.Nama AS Nama_Mahasiswa,
+        d.Nama AS Nama_Dosen,
+        jd.Tanggal,
+        jd.WaktuMulai,
+        jd.WaktuSelesai,
+        p.Status AS Status_Booking,
+        p.CatatanPermintaan
+
+    FROM Pertemuan p
+
+    JOIN Mahasiswa m
+        ON p.MahasiswaID = m.MahasiswaID
+
+    JOIN JadwalDosen jd
+        ON p.JadwalID = jd.JadwalID
+
+    JOIN Dosen d
+        ON jd.DosenID = d.DosenID
+
+    WHERE
+        (@DosenID IS NULL OR d.DosenID = @DosenID)
+
+        AND
+
+        (@Status IS NULL OR p.Status = @Status)
+
+        AND
+
+        (@Tanggal IS NULL OR CAST(jd.Tanggal AS DATE) = @Tanggal)
+
+    ORDER BY jd.Tanggal DESC;
+END;
+GO
+
+SELECT
+d.Nama,
+jd.Tanggal,
+p.Status
+
+FROM Pertemuan p
+
+JOIN JadwalDosen jd
+ON p.JadwalID = jd.JadwalID
+
+JOIN Dosen d
+ON jd.DosenID = d.DosenID
+
+ORDER BY jd.Tanggal;
+
+
+CREATE PROCEDURE sp_Dashboard
+AS
+BEGIN
+    SELECT
+        d.Nama AS NamaDosen,
+        COUNT(p.PertemuanID) AS JumlahPertemuan
+    FROM Pertemuan p
+    JOIN JadwalDosen jd
+        ON p.JadwalID = jd.JadwalID
+    JOIN Dosen d
+        ON jd.DosenID = d.DosenID
+    GROUP BY d.Nama
+END
+
+CREATE PROCEDURE sp_Dashboard
+AS
+BEGIN
+    SELECT
+        d.Nama AS NamaDosen,
+        COUNT(p.PertemuanID) AS JumlahPertemuan
+    FROM Pertemuan p
+    JOIN JadwalDosen jd
+        ON p.JadwalID = jd.JadwalID
+    JOIN Dosen d
+        ON jd.DosenID = d.DosenID
+    GROUP BY d.Nama
+END
+
+CREATE PROCEDURE sp_DashboardByTahun
+@Tahun INT
+AS
+BEGIN
+    SELECT
+        d.Nama AS NamaDosen,
+        COUNT(p.PertemuanID) AS JumlahPertemuan
+
+    FROM Pertemuan p
+
+    JOIN JadwalDosen jd
+        ON p.JadwalID = jd.JadwalID
+
+    JOIN Dosen d
+        ON jd.DosenID = d.DosenID
+
+    WHERE YEAR(jd.Tanggal) = @Tahun
+
+    GROUP BY d.Nama
+END
+GO
+
+
+ALTER PROCEDURE sp_DashboardBySemester
+@Semester VARCHAR(50)
+
+AS
+BEGIN
+
+SELECT
+    d.Nama AS NamaDosen,
+    COUNT(p.PertemuanID) AS JumlahPertemuan
+
+FROM Pertemuan p
+
+JOIN JadwalDosen jd
+ON p.JadwalID = jd.JadwalID
+
+JOIN Dosen d
+ON jd.DosenID = d.DosenID
+
+WHERE
+(
+    @Semester = 'Genap 2025/2026'
+    AND jd.Tanggal BETWEEN '2026-01-01' AND '2026-06-30'
+)
+
+OR
+(
+    @Semester = 'Ganjil 2026/2027'
+    AND jd.Tanggal BETWEEN '2026-07-01' AND '2026-12-31'
+)
+
+GROUP BY d.Nama
+
+END
+GO
+
+CREATE PROCEDURE sp_ImportMahasiswa
+    @NIM VARCHAR(20),
+    @Nama VARCHAR(100),
+    @Email VARCHAR(100)
+AS
+BEGIN
+    INSERT INTO Mahasiswa (NIM, Nama, Email)
+    VALUES (@NIM, @Nama, @Email);
+END
+GO

@@ -77,22 +77,13 @@ namespace CRUDMahasiswaADO
             if (SelectedDosenID == 0) { MessageBox.Show("Pilih dosen!"); return; }
             if (!ValidasiLogikaInput()) return;
 
-            // Cek Bentrok
             if (IsJadwalBentrok(SelectedDosenID, dtpTanggalKetersediaan.Value, dtpWaktuMulai.Value.TimeOfDay, dtpWaktuSelesai.Value.TimeOfDay))
             {
-                MessageBox.Show("Dosen sudah memiliki jadwal lain di jam yang bersinggungan!");
-                return;
-            }
+                SimpanLog("FormJadwalDosen - Jadwal bentrok");
 
-            if (SelectedDosenID == 0)
-            {
-                MessageBox.Show("Pilih dosen terlebih dahulu!");
-                return;
-            }
+                MessageBox.Show(
+                "Dosen sudah memiliki jadwal lain di jam yang bersinggungan!");
 
-            if (dtpWaktuMulai.Value.TimeOfDay >= dtpWaktuSelesai.Value.TimeOfDay)
-            {
-                MessageBox.Show("Waktu selesai harus lebih besar dari waktu mulai!");
                 return;
             }
 
@@ -116,9 +107,18 @@ namespace CRUDMahasiswaADO
                     LoadData(); ;
                 }
             }
+            catch (SqlException ex)
+            {
+                SimpanLog("FormJadwalDosen - Insert : " + ex.Message);
+
+                MessageBox.Show("SQL Error : " + ex.Message);
+            }
+
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                SimpanLog("FormJadwalDosen - Insert : " + ex.Message);
+
+                MessageBox.Show("General Error : " + ex.Message);
             }
         }
 
@@ -186,9 +186,18 @@ namespace CRUDMahasiswaADO
                     MessageBox.Show("Gagal memperbarui data.");
                 }
             }
+            catch (SqlException ex)
+            {
+                SimpanLog("FormJadwalDosen - Insert : " + ex.Message);
+
+                MessageBox.Show("SQL Error : " + ex.Message);
+            }
+
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                SimpanLog("FormJadwalDosen - Insert : " + ex.Message);
+
+                MessageBox.Show("General Error : " + ex.Message);
             }
         }
 
@@ -239,9 +248,18 @@ namespace CRUDMahasiswaADO
                     MessageBox.Show("Gagal menghapus data.");
                 }
             }
+            catch (SqlException ex)
+            {
+                SimpanLog("FormJadwalDosen - Insert : " + ex.Message);
+
+                MessageBox.Show("SQL Error : " + ex.Message);
+            }
+
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                SimpanLog("FormJadwalDosen - Insert : " + ex.Message);
+
+                MessageBox.Show("General Error : " + ex.Message);
             }
         }
 
@@ -506,6 +524,26 @@ namespace CRUDMahasiswaADO
         private void cmbLokasi_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void SimpanLog(string pesan)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query =
+                @"INSERT INTO LogError
+        (waktu, pesan_error)
+        VALUES(GETDATE(), @pesan)";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@pesan", pesan);
+
+                    conn.Open();
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
     }
 

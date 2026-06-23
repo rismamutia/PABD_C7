@@ -51,17 +51,18 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.bindingNavigator1 = new System.Windows.Forms.BindingNavigator(this.components);
+            this.bindingNavigatorAddNewItem = new System.Windows.Forms.ToolStripButton();
+            this.bindingNavigatorCountItem = new System.Windows.Forms.ToolStripLabel();
+            this.bindingNavigatorDeleteItem = new System.Windows.Forms.ToolStripButton();
             this.bindingNavigatorMoveFirstItem = new System.Windows.Forms.ToolStripButton();
             this.bindingNavigatorMovePreviousItem = new System.Windows.Forms.ToolStripButton();
             this.bindingNavigatorSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.bindingNavigatorPositionItem = new System.Windows.Forms.ToolStripTextBox();
-            this.bindingNavigatorCountItem = new System.Windows.Forms.ToolStripLabel();
             this.bindingNavigatorSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.bindingNavigatorMoveNextItem = new System.Windows.Forms.ToolStripButton();
             this.bindingNavigatorMoveLastItem = new System.Windows.Forms.ToolStripButton();
             this.bindingNavigatorSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.bindingNavigatorAddNewItem = new System.Windows.Forms.ToolStripButton();
-            this.bindingNavigatorDeleteItem = new System.Windows.Forms.ToolStripButton();
+            this.btnRekapData = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bindingNavigator1)).BeginInit();
             this.bindingNavigator1.SuspendLayout();
@@ -80,7 +81,7 @@
             // txtNIM
             // 
             this.txtNIM.Location = new System.Drawing.Point(48, 62);
-            this.txtNIM.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtNIM.Margin = new System.Windows.Forms.Padding(2);
             this.txtNIM.Name = "txtNIM";
             this.txtNIM.Size = new System.Drawing.Size(128, 20);
             this.txtNIM.TabIndex = 6;
@@ -89,7 +90,7 @@
             // txtCatatan
             // 
             this.txtCatatan.Location = new System.Drawing.Point(160, 190);
-            this.txtCatatan.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtCatatan.Margin = new System.Windows.Forms.Padding(2);
             this.txtCatatan.Name = "txtCatatan";
             this.txtCatatan.Size = new System.Drawing.Size(279, 20);
             this.txtCatatan.TabIndex = 7;
@@ -112,7 +113,7 @@
             "Unavailable",
             "Booked"});
             this.cmbStatus.Location = new System.Drawing.Point(48, 156);
-            this.cmbStatus.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.cmbStatus.Margin = new System.Windows.Forms.Padding(2);
             this.cmbStatus.Name = "cmbStatus";
             this.cmbStatus.Size = new System.Drawing.Size(174, 21);
             this.cmbStatus.TabIndex = 9;
@@ -121,7 +122,7 @@
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Location = new System.Drawing.Point(36, 231);
-            this.dataGridView1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(2);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
@@ -131,8 +132,8 @@
             // 
             // btnConnect
             // 
-            this.btnConnect.Location = new System.Drawing.Point(486, 41);
-            this.btnConnect.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnConnect.Location = new System.Drawing.Point(477, 58);
+            this.btnConnect.Margin = new System.Windows.Forms.Padding(2);
             this.btnConnect.Name = "btnConnect";
             this.btnConnect.Size = new System.Drawing.Size(105, 24);
             this.btnConnect.TabIndex = 11;
@@ -143,8 +144,8 @@
             // btnLoad
             // 
             this.btnLoad.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.btnLoad.Location = new System.Drawing.Point(486, 69);
-            this.btnLoad.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnLoad.Location = new System.Drawing.Point(477, 86);
+            this.btnLoad.Margin = new System.Windows.Forms.Padding(2);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(105, 24);
             this.btnLoad.TabIndex = 12;
@@ -155,8 +156,8 @@
             // btnInsert
             // 
             this.btnInsert.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.btnInsert.Location = new System.Drawing.Point(486, 97);
-            this.btnInsert.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnInsert.Location = new System.Drawing.Point(477, 114);
+            this.btnInsert.Margin = new System.Windows.Forms.Padding(2);
             this.btnInsert.Name = "btnInsert";
             this.btnInsert.Size = new System.Drawing.Size(105, 25);
             this.btnInsert.TabIndex = 13;
@@ -167,8 +168,8 @@
             // btnUpdate
             // 
             this.btnUpdate.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.btnUpdate.Location = new System.Drawing.Point(486, 129);
-            this.btnUpdate.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnUpdate.Location = new System.Drawing.Point(477, 143);
+            this.btnUpdate.Margin = new System.Windows.Forms.Padding(2);
             this.btnUpdate.Name = "btnUpdate";
             this.btnUpdate.Size = new System.Drawing.Size(105, 23);
             this.btnUpdate.TabIndex = 14;
@@ -179,8 +180,8 @@
             // btnDelete
             // 
             this.btnDelete.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.btnDelete.Location = new System.Drawing.Point(486, 156);
-            this.btnDelete.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnDelete.Location = new System.Drawing.Point(477, 170);
+            this.btnDelete.Margin = new System.Windows.Forms.Padding(2);
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(105, 23);
             this.btnDelete.TabIndex = 15;
@@ -220,7 +221,7 @@
             // txtNamaMahasiswa
             // 
             this.txtNamaMahasiswa.Location = new System.Drawing.Point(271, 63);
-            this.txtNamaMahasiswa.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtNamaMahasiswa.Margin = new System.Windows.Forms.Padding(2);
             this.txtNamaMahasiswa.Name = "txtNamaMahasiswa";
             this.txtNamaMahasiswa.Size = new System.Drawing.Size(168, 20);
             this.txtNamaMahasiswa.TabIndex = 20;
@@ -229,7 +230,7 @@
             // btnCariMahasiswa
             // 
             this.btnCariMahasiswa.Location = new System.Drawing.Point(180, 63);
-            this.btnCariMahasiswa.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnCariMahasiswa.Margin = new System.Windows.Forms.Padding(2);
             this.btnCariMahasiswa.Name = "btnCariMahasiswa";
             this.btnCariMahasiswa.Size = new System.Drawing.Size(56, 19);
             this.btnCariMahasiswa.TabIndex = 21;
@@ -241,7 +242,7 @@
             // 
             this.cmbDosen.FormattingEnabled = true;
             this.cmbDosen.Location = new System.Drawing.Point(48, 118);
-            this.cmbDosen.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.cmbDosen.Margin = new System.Windows.Forms.Padding(2);
             this.cmbDosen.Name = "cmbDosen";
             this.cmbDosen.Size = new System.Drawing.Size(174, 21);
             this.cmbDosen.TabIndex = 22;
@@ -251,7 +252,7 @@
             // 
             this.cmbJadwal.FormattingEnabled = true;
             this.cmbJadwal.Location = new System.Drawing.Point(271, 118);
-            this.cmbJadwal.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.cmbJadwal.Margin = new System.Windows.Forms.Padding(2);
             this.cmbJadwal.Name = "cmbJadwal";
             this.cmbJadwal.Size = new System.Drawing.Size(168, 21);
             this.cmbJadwal.TabIndex = 23;
@@ -305,6 +306,31 @@
             this.bindingNavigator1.TabIndex = 26;
             this.bindingNavigator1.Text = "bindingNavigator1";
             // 
+            // bindingNavigatorAddNewItem
+            // 
+            this.bindingNavigatorAddNewItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bindingNavigatorAddNewItem.Image = ((System.Drawing.Image)(resources.GetObject("bindingNavigatorAddNewItem.Image")));
+            this.bindingNavigatorAddNewItem.Name = "bindingNavigatorAddNewItem";
+            this.bindingNavigatorAddNewItem.RightToLeftAutoMirrorImage = true;
+            this.bindingNavigatorAddNewItem.Size = new System.Drawing.Size(23, 22);
+            this.bindingNavigatorAddNewItem.Text = "Add new";
+            // 
+            // bindingNavigatorCountItem
+            // 
+            this.bindingNavigatorCountItem.Name = "bindingNavigatorCountItem";
+            this.bindingNavigatorCountItem.Size = new System.Drawing.Size(35, 22);
+            this.bindingNavigatorCountItem.Text = "of {0}";
+            this.bindingNavigatorCountItem.ToolTipText = "Total number of items";
+            // 
+            // bindingNavigatorDeleteItem
+            // 
+            this.bindingNavigatorDeleteItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bindingNavigatorDeleteItem.Image = ((System.Drawing.Image)(resources.GetObject("bindingNavigatorDeleteItem.Image")));
+            this.bindingNavigatorDeleteItem.Name = "bindingNavigatorDeleteItem";
+            this.bindingNavigatorDeleteItem.RightToLeftAutoMirrorImage = true;
+            this.bindingNavigatorDeleteItem.Size = new System.Drawing.Size(23, 22);
+            this.bindingNavigatorDeleteItem.Text = "Delete";
+            // 
             // bindingNavigatorMoveFirstItem
             // 
             this.bindingNavigatorMoveFirstItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -338,16 +364,9 @@
             this.bindingNavigatorPositionItem.Text = "0";
             this.bindingNavigatorPositionItem.ToolTipText = "Current position";
             // 
-            // bindingNavigatorCountItem
-            // 
-            this.bindingNavigatorCountItem.Name = "bindingNavigatorCountItem";
-            this.bindingNavigatorCountItem.Size = new System.Drawing.Size(35, 22);
-            this.bindingNavigatorCountItem.Text = "of {0}";
-            this.bindingNavigatorCountItem.ToolTipText = "Total number of items";
-            // 
             // bindingNavigatorSeparator1
             // 
-            this.bindingNavigatorSeparator1.Name = "bindingNavigatorSeparator";
+            this.bindingNavigatorSeparator1.Name = "bindingNavigatorSeparator1";
             this.bindingNavigatorSeparator1.Size = new System.Drawing.Size(6, 25);
             // 
             // bindingNavigatorMoveNextItem
@@ -370,32 +389,26 @@
             // 
             // bindingNavigatorSeparator2
             // 
-            this.bindingNavigatorSeparator2.Name = "bindingNavigatorSeparator";
+            this.bindingNavigatorSeparator2.Name = "bindingNavigatorSeparator2";
             this.bindingNavigatorSeparator2.Size = new System.Drawing.Size(6, 25);
             // 
-            // bindingNavigatorAddNewItem
+            // btnRekapData
             // 
-            this.bindingNavigatorAddNewItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bindingNavigatorAddNewItem.Image = ((System.Drawing.Image)(resources.GetObject("bindingNavigatorAddNewItem.Image")));
-            this.bindingNavigatorAddNewItem.Name = "bindingNavigatorAddNewItem";
-            this.bindingNavigatorAddNewItem.RightToLeftAutoMirrorImage = true;
-            this.bindingNavigatorAddNewItem.Size = new System.Drawing.Size(23, 22);
-            this.bindingNavigatorAddNewItem.Text = "Add new";
-            // 
-            // bindingNavigatorDeleteItem
-            // 
-            this.bindingNavigatorDeleteItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bindingNavigatorDeleteItem.Image = ((System.Drawing.Image)(resources.GetObject("bindingNavigatorDeleteItem.Image")));
-            this.bindingNavigatorDeleteItem.Name = "bindingNavigatorDeleteItem";
-            this.bindingNavigatorDeleteItem.RightToLeftAutoMirrorImage = true;
-            this.bindingNavigatorDeleteItem.Size = new System.Drawing.Size(23, 22);
-            this.bindingNavigatorDeleteItem.Text = "Delete";
+            this.btnRekapData.Location = new System.Drawing.Point(541, 411);
+            this.btnRekapData.Name = "btnRekapData";
+            this.btnRekapData.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.btnRekapData.Size = new System.Drawing.Size(86, 29);
+            this.btnRekapData.TabIndex = 27;
+            this.btnRekapData.Text = "Rekap Data";
+            this.btnRekapData.UseVisualStyleBackColor = true;
+            this.btnRekapData.Click += new System.EventHandler(this.btnRekapData_Click);
             // 
             // JadwalPertemuan
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(665, 452);
+            this.Controls.Add(this.btnRekapData);
             this.Controls.Add(this.bindingNavigator1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -417,7 +430,7 @@
             this.Controls.Add(this.txtCatatan);
             this.Controls.Add(this.txtNIM);
             this.Controls.Add(this.label4);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "JadwalPertemuan";
             this.Text = " k";
             this.Load += new System.EventHandler(this.JadwalPertemuan_Load);
@@ -463,5 +476,6 @@
         private System.Windows.Forms.ToolStripButton bindingNavigatorMoveNextItem;
         private System.Windows.Forms.ToolStripButton bindingNavigatorMoveLastItem;
         private System.Windows.Forms.ToolStripSeparator bindingNavigatorSeparator2;
+        private System.Windows.Forms.Button btnRekapData;
     }
 }
