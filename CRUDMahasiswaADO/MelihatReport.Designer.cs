@@ -33,6 +33,7 @@
             this.btnClose = new System.Windows.Forms.Button();
             this.txtSearch = new System.Windows.Forms.TextBox();
             this.btnCari = new System.Windows.Forms.Button();
+            this.btnRekapData = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -51,7 +52,7 @@
             // btnRefresh
             // 
             this.btnRefresh.BackColor = System.Drawing.Color.LightGreen;
-            this.btnRefresh.Location = new System.Drawing.Point(218, 298);
+            this.btnRefresh.Location = new System.Drawing.Point(38, 298);
             this.btnRefresh.Margin = new System.Windows.Forms.Padding(2);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(86, 32);
@@ -63,7 +64,7 @@
             // btnClose
             // 
             this.btnClose.BackColor = System.Drawing.Color.Red;
-            this.btnClose.Location = new System.Drawing.Point(335, 298);
+            this.btnClose.Location = new System.Drawing.Point(151, 298);
             this.btnClose.Margin = new System.Windows.Forms.Padding(2);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(86, 32);
@@ -92,12 +93,23 @@
             this.btnCari.UseVisualStyleBackColor = false;
             this.btnCari.Click += new System.EventHandler(this.btnCari_Click);
             // 
+            // btnRekapData
+            // 
+            this.btnRekapData.Location = new System.Drawing.Point(481, 298);
+            this.btnRekapData.Name = "btnRekapData";
+            this.btnRekapData.Size = new System.Drawing.Size(86, 32);
+            this.btnRekapData.TabIndex = 6;
+            this.btnRekapData.Text = "Rekap Data";
+            this.btnRekapData.UseVisualStyleBackColor = true;
+            this.btnRekapData.Click += new System.EventHandler(this.btnRekapData_Click);
+            // 
             // MelihatReport
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.ClientSize = new System.Drawing.Size(600, 366);
+            this.Controls.Add(this.btnRekapData);
             this.Controls.Add(this.btnCari);
             this.Controls.Add(this.txtSearch);
             this.Controls.Add(this.btnClose);
@@ -120,5 +132,6 @@
         private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.TextBox txtSearch;
         private System.Windows.Forms.Button btnCari;
+        private System.Windows.Forms.Button btnRekapData;
     }
 }

@@ -144,5 +144,12 @@ namespace CRUDMahasiswaADO
         {
             LoadReport(txtSearch.Text.Trim());
         }
+
+        private void btnRekapData_Click(object sender, EventArgs e)
+        {
+            rekapData fm3 = new rekapData();
+            fm3.Show();
+            this.Hide();
+        }
     }
 }
