@@ -105,15 +105,11 @@ namespace CRUDMahasiswaADO
             cmd.CommandType =
             CommandType.StoredProcedure;
 
-            cmd.Parameters.AddWithValue(
-            "@Semester",
-            semester
-            );
+            cmd.Parameters.AddWithValue("@Semester",semester);
 
             da = new SqlDataAdapter(cmd);
 
-            DataTable dt =
-            new DataTable();
+            DataTable dt =new DataTable();
 
             da.Fill(dt);
 
@@ -122,10 +118,7 @@ namespace CRUDMahasiswaADO
             return dt;
         }
 
-        public void ImportMahasiswa(
-string nim,
-string nama,
-string email)
+        public void ImportMahasiswa(string nim,string nama,string email)
         {
             if (conn.State ==
             ConnectionState.Closed)
@@ -155,6 +148,104 @@ string email)
             cmd.Parameters.AddWithValue(
             "@Email",
             email
+            );
+
+            cmd.ExecuteNonQuery();
+
+            conn.Close();
+        }
+
+        public void ImportDosen(
+string nidn,
+string nama,
+string email)
+        {
+            if (conn.State ==
+            ConnectionState.Closed)
+            {
+                conn.Open();
+            }
+
+            SqlCommand cmd =
+            new SqlCommand(
+            "sp_ImportDosen",
+            conn
+            );
+
+            cmd.CommandType =
+            CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue(
+            "@NIDN",
+            nidn
+            );
+
+            cmd.Parameters.AddWithValue(
+            "@Nama",
+            nama
+            );
+
+            cmd.Parameters.AddWithValue(
+            "@Email",
+            email
+            );
+
+            cmd.ExecuteNonQuery();
+
+            conn.Close();
+        }
+
+        public void ImportJadwalDosen(
+
+int dosenID,
+
+DateTime tanggal,
+
+TimeSpan mulai,
+
+TimeSpan selesai,
+
+string lokasi
+)
+        {
+            if (conn.State ==
+            ConnectionState.Closed)
+            {
+                conn.Open();
+            }
+
+            SqlCommand cmd =
+            new SqlCommand(
+            "sp_ImportJadwalDosen",
+            conn
+            );
+
+            cmd.CommandType =
+            CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue(
+            "@DosenID",
+            dosenID
+            );
+
+            cmd.Parameters.AddWithValue(
+            "@Tanggal",
+            tanggal.Date
+            );
+
+            cmd.Parameters.AddWithValue(
+            "@Mulai",
+            mulai
+            );
+
+            cmd.Parameters.AddWithValue(
+            "@Selesai",
+            selesai
+            );
+
+            cmd.Parameters.AddWithValue(
+            "@Lokasi",
+            lokasi
             );
 
             cmd.ExecuteNonQuery();

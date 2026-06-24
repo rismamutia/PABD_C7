@@ -53,7 +53,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(60, 72);
+            this.label2.Location = new System.Drawing.Point(60, 73);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(38, 13);
             this.label2.TabIndex = 1;
@@ -62,7 +62,7 @@
             // cmbDosen
             // 
             this.cmbDosen.FormattingEnabled = true;
-            this.cmbDosen.Location = new System.Drawing.Point(108, 67);
+            this.cmbDosen.Location = new System.Drawing.Point(104, 67);
             this.cmbDosen.Name = "cmbDosen";
             this.cmbDosen.Size = new System.Drawing.Size(182, 21);
             this.cmbDosen.TabIndex = 2;
@@ -98,7 +98,7 @@
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(63, 113);
+            this.dataGridView1.Location = new System.Drawing.Point(78, 97);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.Size = new System.Drawing.Size(632, 254);
             this.dataGridView1.TabIndex = 6;
@@ -128,6 +128,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.btnDashboard);
             this.Controls.Add(this.btnCetak);

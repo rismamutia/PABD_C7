@@ -167,6 +167,9 @@ namespace CRUDMahasiswaADO
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
+            if (!CekValidasi())
+                return;
+
             if (bs.Current != null)
             {
                 selectedPertemuanID =
@@ -596,7 +599,8 @@ namespace CRUDMahasiswaADO
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 string query = @"INSERT INTO LogError
-                        VALUES(GETDATE(), @pesan)";
+                     (waktu, pesan_error)
+                     VALUES(GETDATE(), @pesan)";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {

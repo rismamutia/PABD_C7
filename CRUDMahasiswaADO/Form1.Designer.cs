@@ -60,6 +60,8 @@
             this.bindingNavigatorSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.label7 = new System.Windows.Forms.Label();
             this.cmbLokasi = new System.Windows.Forms.ComboBox();
+            this.btnImpDB = new System.Windows.Forms.Button();
+            this.btnImpEx = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bindingNavigator1)).BeginInit();
             this.bindingNavigator1.SuspendLayout();
@@ -116,7 +118,7 @@
             // 
             // btnConnect
             // 
-            this.btnConnect.Location = new System.Drawing.Point(398, 211);
+            this.btnConnect.Location = new System.Drawing.Point(357, 214);
             this.btnConnect.Margin = new System.Windows.Forms.Padding(2);
             this.btnConnect.Name = "btnConnect";
             this.btnConnect.Size = new System.Drawing.Size(116, 19);
@@ -127,7 +129,7 @@
             // 
             // btnLoad
             // 
-            this.btnLoad.Location = new System.Drawing.Point(398, 235);
+            this.btnLoad.Location = new System.Drawing.Point(357, 240);
             this.btnLoad.Margin = new System.Windows.Forms.Padding(2);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(116, 19);
@@ -138,7 +140,7 @@
             // 
             // btnInsert
             // 
-            this.btnInsert.Location = new System.Drawing.Point(398, 258);
+            this.btnInsert.Location = new System.Drawing.Point(357, 266);
             this.btnInsert.Margin = new System.Windows.Forms.Padding(2);
             this.btnInsert.Name = "btnInsert";
             this.btnInsert.Size = new System.Drawing.Size(116, 19);
@@ -149,7 +151,7 @@
             // 
             // btnUpdate
             // 
-            this.btnUpdate.Location = new System.Drawing.Point(398, 282);
+            this.btnUpdate.Location = new System.Drawing.Point(357, 292);
             this.btnUpdate.Margin = new System.Windows.Forms.Padding(2);
             this.btnUpdate.Name = "btnUpdate";
             this.btnUpdate.Size = new System.Drawing.Size(116, 19);
@@ -160,7 +162,7 @@
             // 
             // btnDelete
             // 
-            this.btnDelete.Location = new System.Drawing.Point(398, 306);
+            this.btnDelete.Location = new System.Drawing.Point(357, 317);
             this.btnDelete.Margin = new System.Windows.Forms.Padding(2);
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(116, 19);
@@ -172,13 +174,14 @@
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(47, 30);
+            this.dataGridView1.Location = new System.Drawing.Point(59, 37);
             this.dataGridView1.Margin = new System.Windows.Forms.Padding(2);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.Size = new System.Drawing.Size(485, 141);
             this.dataGridView1.TabIndex = 17;
+            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // dtpTanggalKetersediaan
             // 
@@ -357,11 +360,34 @@
             this.cmbLokasi.TabIndex = 25;
             this.cmbLokasi.SelectedIndexChanged += new System.EventHandler(this.cmbLokasi_SelectedIndexChanged);
             // 
+            // btnImpDB
+            // 
+            this.btnImpDB.Location = new System.Drawing.Point(483, 286);
+            this.btnImpDB.Name = "btnImpDB";
+            this.btnImpDB.Size = new System.Drawing.Size(105, 41);
+            this.btnImpDB.TabIndex = 26;
+            this.btnImpDB.Text = "Import To Database";
+            this.btnImpDB.UseVisualStyleBackColor = true;
+            this.btnImpDB.Click += new System.EventHandler(this.btnImpDB_Click);
+            // 
+            // btnImpEx
+            // 
+            this.btnImpEx.Location = new System.Drawing.Point(483, 230);
+            this.btnImpEx.Name = "btnImpEx";
+            this.btnImpEx.Size = new System.Drawing.Size(105, 39);
+            this.btnImpEx.TabIndex = 27;
+            this.btnImpEx.Text = "Import Form Excel";
+            this.btnImpEx.UseVisualStyleBackColor = true;
+            this.btnImpEx.Click += new System.EventHandler(this.button1_Click);
+            // 
             // FormDosen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.ClientSize = new System.Drawing.Size(600, 366);
+            this.Controls.Add(this.btnImpEx);
+            this.Controls.Add(this.btnImpDB);
             this.Controls.Add(this.cmbLokasi);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.bindingNavigator1);
@@ -425,6 +451,8 @@
         private System.Windows.Forms.ToolStripSeparator bindingNavigatorSeparator2;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.ComboBox cmbLokasi;
+        private System.Windows.Forms.Button btnImpDB;
+        private System.Windows.Forms.Button btnImpEx;
     }
 }
 

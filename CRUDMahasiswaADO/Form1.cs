@@ -1,19 +1,21 @@
-﻿using System;
-using System.Data.SqlClient;
+﻿using ExcelDataReader;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Linq.Expressions;
-
 namespace CRUDMahasiswaADO
 {
     public partial class FormDosen : Form
     {
+        DAL dbLogic = new DAL();
         int SelectedID = 0;
         int SelectedDosenID = 0;
 
@@ -74,6 +76,8 @@ namespace CRUDMahasiswaADO
         }
         private void btnInsert_Click(object sender, EventArgs e)
         {
+            if (!Validasi()) return;
+
             if (SelectedDosenID == 0) { MessageBox.Show("Pilih dosen!"); return; }
             if (!ValidasiLogikaInput()) return;
 
@@ -188,14 +192,14 @@ namespace CRUDMahasiswaADO
             }
             catch (SqlException ex)
             {
-                SimpanLog("FormJadwalDosen - Insert : " + ex.Message);
+                SimpanLog("FormJadwalDosen - Update : " + ex.Message);
 
                 MessageBox.Show("SQL Error : " + ex.Message);
             }
 
             catch (Exception ex)
             {
-                SimpanLog("FormJadwalDosen - Insert : " + ex.Message);
+                SimpanLog("FormJadwalDosen - Update : " + ex.Message);
 
                 MessageBox.Show("General Error : " + ex.Message);
             }
@@ -250,14 +254,14 @@ namespace CRUDMahasiswaADO
             }
             catch (SqlException ex)
             {
-                SimpanLog("FormJadwalDosen - Insert : " + ex.Message);
+                SimpanLog("FormJadwalDosen - Delete : " + ex.Message);
 
                 MessageBox.Show("SQL Error : " + ex.Message);
             }
 
             catch (Exception ex)
             {
-                SimpanLog("FormJadwalDosen - Insert : " + ex.Message);
+                SimpanLog("FormJadwalDosen - Delete : " + ex.Message);
 
                 MessageBox.Show("General Error : " + ex.Message);
             }
@@ -351,7 +355,7 @@ namespace CRUDMahasiswaADO
         {
 
         }
-        
+
 
         private void LoadDosen()
         {
@@ -498,7 +502,7 @@ namespace CRUDMahasiswaADO
             }
         }
 
-            private void BindControls()
+        private void BindControls()
         {
             txtNIDN.DataBindings.Clear();
             cmbDosen.DataBindings.Clear();
@@ -545,6 +549,117 @@ namespace CRUDMahasiswaADO
                 }
             }
         }
-    }
 
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog ofd = new OpenFileDialog())
+            {
+                ofd.Filter =
+                "Excel Files|*.xls;*.xlsx";
+
+                if (ofd.ShowDialog() ==
+                DialogResult.OK)
+                {
+                    using (var stream =
+                    new FileStream(
+                        ofd.FileName,
+                        FileMode.Open,
+                        FileAccess.Read,
+                        FileShare.ReadWrite))
+                    {
+                        using (var reader =
+                        ExcelReaderFactory.CreateReader(stream))
+                        {
+                            var result =
+                            reader.AsDataSet(
+                            new ExcelDataSetConfiguration()
+                            {
+                                ConfigureDataTable =
+                                (_) =>
+                                new ExcelDataTableConfiguration()
+                                {
+                                    UseHeaderRow = true
+                                }
+                            });
+
+                            dataGridView1.DataSource =
+                            result.Tables[0];
+
+                            btnImpDB.Enabled = true;
+                        }
+                    }
+                }
+            }
+        }
+
+
+        private void btnImpDB_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                DataTable dt =
+                (DataTable)
+                dataGridView1.DataSource;
+
+                if (dt == null)
+                {
+                    MessageBox.Show(
+                    "Tidak ada data."
+                    );
+
+                    return;
+                }
+
+                int sukses = 0;
+
+                foreach (DataRow row
+                in dt.Rows)
+                {
+                    int dosenID = Convert.ToInt32(row["DosenID"]);
+
+                    DateTime tanggal =Convert.ToDateTime(row["Tanggal"]);
+
+                    TimeSpan mulai = Convert.ToDateTime(row["WaktuMulai"]).TimeOfDay;
+
+                    TimeSpan selesai =Convert.ToDateTime(row["WaktuSelesai"]).TimeOfDay;
+
+                    string lokasi =row["Lokasi"].ToString();
+
+                    dbLogic.ImportJadwalDosen(
+
+                    dosenID,
+
+                    tanggal,
+
+                    mulai,
+
+                    selesai,
+
+                    lokasi
+
+                    );
+
+                    sukses++;
+                }
+
+                MessageBox.Show(
+                sukses +
+                " data berhasil diimport."
+                );
+
+                LoadData();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                ex.Message
+                );
+            }
+        }
     }
+}

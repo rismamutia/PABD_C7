@@ -70,6 +70,8 @@ namespace CRUDMahasiswaADO
 
         private void btnInsert_Click(object sender, EventArgs e)
         {
+            if (!Validasi()) return;
+
             SqlConnection conn =
                  new SqlConnection(connectionString);
 
@@ -88,7 +90,13 @@ namespace CRUDMahasiswaADO
 
                 cmd.ExecuteNonQuery();
 
-                SqlCommand cmdLog = new SqlCommand("INSERT INTO LogError (Waktu, Pesan) VALUES (GETDATE(), 'Data mahasiswa berhasil ditambahkan')", conn, trans);
+                SqlCommand cmdLog = new SqlCommand("INSERT INTO LogError (waktu, pesan_error) VALUES (GETDATE(), @pesan)",conn,trans);
+
+                cmdLog.Parameters.AddWithValue(
+                "@pesan",
+                "Data mahasiswa berhasil ditambahkan"
+                );
+
                 cmdLog.ExecuteNonQuery();
 
                 trans.Commit();
@@ -121,7 +129,11 @@ namespace CRUDMahasiswaADO
                 return;
             }
 
-            if (!Validasi()) return;
+            if (!Validasi())
+            {
+                LoadData();
+                return;
+            }
 
             try
             {
@@ -230,7 +242,7 @@ namespace CRUDMahasiswaADO
 
             bindingNavigator1.BindingSource = bindingSource;
 
-            btnImpDB.Enabled = false;
+            btnImpDB.Enabled = true;
 
             LoadData();
             HitungTotal();
@@ -410,8 +422,7 @@ namespace CRUDMahasiswaADO
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string query = @"INSERT INTO LogError
-                        VALUES(GETDATE(), @pesan)";
+                string query = @"INSERT INTO LogError(waktu, pesan_error)VALUES(GETDATE(), @pesan)";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {

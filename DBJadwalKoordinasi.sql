@@ -1048,6 +1048,22 @@ BEGIN
 	VALUES('Tambah data mahasiswa', GETDATE());
 END;
 
+CREATE TRIGGER trg_UpdateMahasiswa
+ON Mahasiswa
+AFTER UPDATE
+AS
+BEGIN
+    INSERT INTO LogAktivitas
+    (
+        aktivitas,waktu
+    )
+    VALUES
+    (
+        'Update data mahasiswa',GETDATE()
+    );
+
+END;
+
 CREATE TRIGGER trg_DeleteMahasiswa
 ON Mahasiswa
 AFTER INSERT
@@ -1064,6 +1080,15 @@ CREATE TABLE LogKeamanan
 	jumlah_data INT,
 	waktu DATETIME
 );
+
+ALTER TRIGGER trg_DeleteMahasiswa
+ON Mahasiswa
+AFTER DELETE
+AS
+BEGIN
+    INSERT INTO LogAktivitas
+    VALUES('Hapus data mahasiswa', GETDATE());
+END;
 
 CREATE TRIGGER trg_PreventMassUpdate
 ON Mahasiswa
@@ -1283,3 +1308,268 @@ BEGIN
     VALUES (@NIM, @Nama, @Email);
 END
 GO
+
+ALTER PROCEDURE sp_ImportDosen
+    @NIDN VARCHAR(20),
+    @Nama VARCHAR(100),
+    @Email VARCHAR(100)
+AS
+BEGIN
+    INSERT INTO Dosen (NIDN, Nama, Email)
+    VALUES (@NIDN, @Nama, @Email);
+END
+GO
+
+
+CREATE OR ALTER VIEW View_DataDosen
+AS
+SELECT DosenID, NIDN, Nama, Email
+FROM Dosen;
+
+SELECT * FROM LogError;
+SELECT name
+FROM sys.triggers;
+
+
+SELECT * FROM LogAktivitas;
+
+SELECT * FROM Mahasiswa;
+
+UPDATE Mahasiswa
+SET Nama = 'TEST';
+
+SELECT * FROM LogKeamanan;
+
+CREATE TRIGGER trg_InsertDosen
+ON Dosen
+AFTER INSERT
+AS
+BEGIN
+
+    INSERT INTO LogAktivitas
+    (
+        aktivitas,
+        waktu
+    )
+
+    VALUES
+    (
+        'Tambah data dosen',
+        GETDATE()
+    );
+
+END;
+GO
+
+
+CREATE TRIGGER trg_UpdateDosen
+ON Dosen
+AFTER UPDATE
+AS
+BEGIN
+
+    INSERT INTO LogAktivitas
+    (
+        aktivitas,
+        waktu
+    )
+
+    VALUES
+    (
+        'Update data dosen',
+        GETDATE()
+    );
+
+END;
+GO
+
+
+CREATE TRIGGER trg_DeleteDosen
+ON Dosen
+AFTER DELETE
+AS
+BEGIN
+
+    INSERT INTO LogAktivitas
+    (
+        aktivitas,
+        waktu
+    )
+
+    VALUES
+    (
+        'Hapus data dosen',
+        GETDATE()
+    );
+
+END;
+GO
+
+CREATE PROCEDURE sp_ImportJadwalDosen
+
+@DosenID INT,
+
+@Tanggal DATE,
+
+@Mulai TIME,
+
+@Selesai TIME,
+
+@Lokasi VARCHAR(100)
+
+AS
+
+BEGIN
+
+INSERT INTO JadwalDosen
+(
+DosenID,
+Tanggal,
+WaktuMulai,
+WaktuSelesai,
+Lokasi
+)
+
+VALUES
+(
+@DosenID,
+@Tanggal,
+@Mulai,
+@Selesai,
+@Lokasi
+)
+
+END
+
+GO
+SELECT * FROM LogAktivitas;
+
+
+ALTER PROCEDURE sp_ImportJadwalDosen
+    @DosenID INT,
+    @Tanggal DATE,
+    @Mulai TIME,
+    @Selesai TIME,
+    @Lokasi VARCHAR(100)
+AS
+BEGIN
+
+    INSERT INTO JadwalDosen
+    (
+        DosenID,
+        Tanggal,
+        WaktuMulai,
+        WaktuSelesai,
+        Status,
+        Lokasi
+    )
+    VALUES
+    (
+        @DosenID,
+        @Tanggal,
+        @Mulai,
+        @Selesai,
+        'Available',
+        @Lokasi
+    );
+
+END
+GO
+
+SELECT *
+FROM JadwalDosen;
+
+ALTER PROCEDURE sp_UpdateMahasiswa
+    @ID INT,
+    @NIM VARCHAR(20),
+    @Nama VARCHAR(100),
+    @Email VARCHAR(100)
+AS
+BEGIN
+    IF EXISTS
+    (
+        SELECT 1
+        FROM Mahasiswa
+        WHERE NIM = @NIM
+        AND MahasiswaID <> @ID
+    )
+    BEGIN
+        RAISERROR(
+        'NIM sudah digunakan oleh mahasiswa lain!',
+        16,
+        1
+        )
+    END
+    ELSE IF EXISTS
+    (
+        SELECT 1
+        FROM Mahasiswa
+        WHERE Email = @Email
+        AND MahasiswaID <> @ID
+    )
+    BEGIN
+        RAISERROR(
+        'Email sudah digunakan oleh mahasiswa lain!',
+        16,
+        1
+        )
+    END
+    ELSE
+    BEGIN
+        UPDATE Mahasiswa
+        SET
+            NIM = @NIM,
+            Nama = @Nama,
+            Email = @Email
+        WHERE MahasiswaID = @ID
+    END
+END
+GO
+
+ALTER PROCEDURE sp_UpdateDosen
+    @ID INT,
+    @NIDN VARCHAR(20),
+    @Nama VARCHAR(100),
+    @Email VARCHAR(100)
+AS
+BEGIN
+    IF EXISTS
+    (
+        SELECT 1
+        FROM Dosen
+        WHERE NIDN = @NIDN
+        AND DosenID <> @ID
+    )
+    BEGIN
+        RAISERROR(
+        'NIDN sudah digunakan oleh dosen lain!',
+        16,
+        1
+        )
+    END
+    ELSE IF EXISTS
+    (
+        SELECT 1
+        FROM Dosen
+        WHERE Email = @Email
+        AND DosenID <> @ID
+    )
+    BEGIN
+        RAISERROR(
+        'Email sudah digunakan oleh dosen lain!',
+        16,
+        1
+        )
+    END
+    ELSE
+    BEGIN
+        UPDATE Dosen
+        SET
+            NIDN = @NIDN,
+            Nama = @Nama,
+            Email = @Email
+        WHERE DosenID = @ID
+    END
+END
+GO
+

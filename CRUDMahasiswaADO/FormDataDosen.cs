@@ -1,20 +1,15 @@
 ﻿using ExcelDataReader;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CRUDMahasiswaADO
 {
     public partial class FormDataDosen : Form
     {
+        DAL dbLogic = new DAL();
         private int selectedID = 0;
 
         private readonly SqlConnection conn;
@@ -59,6 +54,12 @@ namespace CRUDMahasiswaADO
 
         private void btnInsert_Click(object sender, EventArgs e)
         {
+            if (!Validasi())
+            {
+                LoadData();
+                return;
+            }
+
             SqlConnection conn =
                 new SqlConnection(connectionString);
 
@@ -69,7 +70,7 @@ namespace CRUDMahasiswaADO
 
             try
             {
-                SqlCommand cmd = new SqlCommand("sp_InsertMahasiswa", conn, trans);
+                SqlCommand cmd = new SqlCommand("sp_InsertDosen", conn, trans);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@NIDN", txtNIDN.Text);
                 cmd.Parameters.AddWithValue("@Nama", txtNama.Text);
@@ -77,11 +78,15 @@ namespace CRUDMahasiswaADO
 
                 cmd.ExecuteNonQuery();
 
-                SqlCommand cmdLog = new SqlCommand("INSERT INTO LogError (Waktu, Pesan) VALUES (GETDATE(), 'Data dosen berhasil ditambahkan')", conn, trans);
+                SqlCommand cmdLog = new SqlCommand("INSERT INTO LogError (waktu, pesan_error) VALUES (GETDATE(), @pesan)", conn, trans);
+
+                cmdLog.Parameters.AddWithValue("@pesan", "Data dosen berhasil ditambahkan");
+
                 cmdLog.ExecuteNonQuery();
 
                 trans.Commit();
                 MessageBox.Show("Data dosen berhasil ditambahkan!");
+                ClearForm();
                 LoadData();
             }
             catch (SqlException ex)
@@ -104,10 +109,6 @@ namespace CRUDMahasiswaADO
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-            selectedID = Convert.ToInt32(
-                ((DataRowView)bs.Current)["DosenID"]
-            );
-
             if (!Validasi()) return;
 
             try
@@ -200,13 +201,29 @@ namespace CRUDMahasiswaADO
         {
             if (e.RowIndex >= 0)
             {
-                DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
+                DataGridViewRow row =
+                dataGridView1.Rows[e.RowIndex];
 
-                selectedID = Convert.ToInt32(row.Cells["DosenID"].Value);
+                txtNIDN.Text =
+                row.Cells["NIDN"].Value.ToString();
 
-                txtNIDN.Text = row.Cells["NIDN"].Value.ToString();
-                txtNama.Text = row.Cells["Nama"].Value.ToString();
-                txtEmail.Text = row.Cells["Email"].Value.ToString();
+                txtNama.Text =
+                row.Cells["Nama"].Value.ToString();
+
+                txtEmail.Text =
+                row.Cells["Email"].Value.ToString();
+
+                // Hanya ambil DosenID kalau memang ada
+                if (dataGridView1.Columns.Contains("DosenID"))
+                {
+                    selectedID = Convert.ToInt32(
+                    row.Cells["DosenID"].Value
+                    );
+                }
+                else
+                {
+                    selectedID = 0;
+                }
             }
         }
 
@@ -283,8 +300,8 @@ namespace CRUDMahasiswaADO
             }
         }
 
-       
-        
+
+
 
         private void FormDataDosen_Load(object sender, EventArgs e)
         {
@@ -339,26 +356,98 @@ namespace CRUDMahasiswaADO
 
         private void SimpanLog(string pesan)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn =
+   new SqlConnection(connectionString))
             {
-                string query = @"INSERT INTO LogError
-                        VALUES(GETDATE(), @pesan)";
+                string query = @"
+        INSERT INTO LogError
+        (
+            waktu,
+            pesan_error
+        )
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+        VALUES
+        (
+            GETDATE(),
+            @pesan
+        )";
+
+                using (SqlCommand cmd =
+                new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@pesan", pesan);
+                    cmd.Parameters.AddWithValue(
+                    "@pesan",
+                    pesan
+                    );
 
                     conn.Open();
+
                     cmd.ExecuteNonQuery();
                 }
-
             }
         }
 
-        private void btnImpEx_Click(object sender, EventArgs e)
+
+
+        private void btnImpDB_Click_1(object sender, EventArgs e)
+        {
+            try
+            {
+                DataTable dt =
+                (DataTable)dataGridView1.DataSource;
+
+                if (dt == null ||
+                dt.Rows.Count == 0)
+                {
+                    MessageBox.Show(
+                    "Tidak ada data untuk diimport.");
+
+                    return;
+                }
+
+                int sukses = 0;
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    string nidn =
+                    row["NIDN"].ToString().Trim();
+
+                    string nama =
+                    row["Nama"].ToString().Trim();
+
+                    string email =
+                    row["Email"].ToString().Trim();
+
+                    if (string.IsNullOrEmpty(nidn)
+                    || string.IsNullOrEmpty(nama))
+                    {
+                        continue;
+                    }
+
+                    dbLogic.ImportDosen(
+                    nidn,
+                    nama,
+                    email
+                    );
+
+                    sukses++;
+                }
+
+                MessageBox.Show(
+                sukses +
+                " data berhasil diimport.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                ex.Message);
+            }
+        }
+
+        private void btnImpEx_Click_1(object sender, EventArgs e)
         {
             using (OpenFileDialog openFileDialog =
-    new OpenFileDialog())
+            new OpenFileDialog())
             {
                 openFileDialog.Filter =
                 "Excel Workbook|*.xls;*.xlsx";
@@ -370,7 +459,8 @@ namespace CRUDMahasiswaADO
                     openFileDialog.FileName;
 
                     using (var stream =
-                    File.Open(filePath,
+                    File.Open(
+                    filePath,
                     FileMode.Open,
                     FileAccess.Read))
                     {
@@ -400,63 +490,6 @@ namespace CRUDMahasiswaADO
                     btnImpDB.Enabled = true;
                 }
             }
-        }
-
-        private void btnImpDB_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                DataTable dt =
-                (DataTable)dataGridView1.DataSource;
-
-                if (dt == null ||
-                dt.Rows.Count == 0)
-                {
-                    MessageBox.Show(
-                    "Tidak ada data untuk diimport.");
-
-                    return;
-                }
-
-                int sukses = 0;
-
-                foreach (DataRow row in dt.Rows)
-                {
-                    string nim =
-                    row["NIM"].ToString().Trim();
-
-                    string nama =
-                    row["Nama"].ToString().Trim();
-
-                    string email =
-                    row["Email"].ToString().Trim();
-
-                    if (string.IsNullOrEmpty(nim)
-                    || string.IsNullOrEmpty(nama))
-                    {
-                        continue;
-                    }
-
-                    dbLogic.ImportMahasiswa(
-                    nim,
-                    nama,
-                    email
-                    );
-
-                    sukses++;
-                }
-
-                MessageBox.Show(
-                sukses +
-                " data berhasil diimport.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                ex.Message);
-            }
-
-
         }
     }
 }

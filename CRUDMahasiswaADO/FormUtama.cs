@@ -15,50 +15,98 @@ namespace CRUDMahasiswaADO
         public FormUtama()
         {
             InitializeComponent();
-            this.IsMdiContainer = true;
-            BuildMenu();
+            this.Resize += FormUtama_Resize;
         }
 
-        private void BuildMenu()
+        private void OpenForm(Form child)
         {
-            MenuStrip menu = new MenuStrip();
+            panelMain.Controls.Clear();
 
-            ToolStripMenuItem mnuData = new ToolStripMenuItem("Data Master");
-            ToolStripMenuItem mnuMhs = new ToolStripMenuItem("Kelola Mahasiswa");
-            ToolStripMenuItem mnuDosen = new ToolStripMenuItem("Kelola Dosen"); 
-            ToolStripMenuItem mnuJadwal = new ToolStripMenuItem("Kelola Jadwal Dosen");
-            ToolStripMenuItem mnuPertemuan = new ToolStripMenuItem("Kelola Jadwal Pertemuan");
-            ToolStripMenuItem mnuKeluar = new ToolStripMenuItem("Keluar");
+            child.TopLevel = false;
 
-            mnuMhs.Click += (s, e) => BukaForm(new FormMahasiswa());
-            mnuDosen.Click += (s, e) => BukaForm(new FormDataDosen());
-            mnuJadwal.Click += (s, e) => BukaForm(new FormDosen());
-            mnuPertemuan.Click += (s, e) => BukaForm(new JadwalPertemuan());
-            mnuKeluar.Click += (s, e) => {
-                if (MessageBox.Show("Yakin ingin keluar?", "Konfirmasi",
-                    MessageBoxButtons.YesNo) == DialogResult.Yes)
-                    Application.Exit();
-            };
+            child.FormBorderStyle = FormBorderStyle.None;
 
-            mnuData.DropDownItems.AddRange(new ToolStripItem[] {
-                mnuMhs, mnuDosen, mnuJadwal, mnuPertemuan,
-                new ToolStripSeparator(), mnuKeluar
-            });
+            child.Dock = DockStyle.Fill;
 
-            menu.Items.Add(mnuData);
-            this.MainMenuStrip = menu;
-            this.Controls.Add(menu);
-        }
+            panelMain.Controls.Add(child);
 
-        private void BukaForm(Form form)
-        {
-            form.MdiParent = this;
-            form.Show();
+            child.Show();
         }
 
         private void FormUtama_Load(object sender, EventArgs e)
         {
+            CenterWelcome();
+        }
+        private void CenterWelcome()
+        {
+            label2.Left =
+            (panelMain.Width -
+            label2.Width) / 2;
+
+            label3.Left =
+            (panelMain.Width -
+            label3.Width) / 2;
+
+            label2.Top =
+            (panelMain.Height / 2) - 40;
+
+            label3.Top =
+            label2.Bottom + 10;
+        }
+
+        private void FormUtama_Resize(object sender,EventArgs e)
+        {
+            CenterWelcome();
+        }
+
+        private void btnMahasiswa_Click(object sender, EventArgs e)
+        {
+            OpenForm(new FormMahasiswa());
+        }
+
+        private void btnDosen_Click(object sender, EventArgs e)
+        {
+            OpenForm(new FormDataDosen());
+        }
+
+        private void btnJadwalDosen_Click(object sender, EventArgs e)
+        {
+            OpenForm(new FormDosen());
+        }
+
+        private void btnJadwalPertemuan_Click(object sender, EventArgs e)
+        {
+            OpenForm(new JadwalPertemuan());
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Yakin ingin keluar?","Konfirmasi", MessageBoxButtons.YesNo)== DialogResult.Yes)
+
+                Application.Exit();
+        }
+
+
+
+        private void btnLaporan_Click(object sender, EventArgs e)
+        {
+            OpenForm(new MelihatReport());
+        }
+
+        private void panel2_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
 
         }
     }
-}
+    }
+

@@ -16,6 +16,9 @@ namespace CRUDMahasiswaADO
         public FormLogin()
         {
             InitializeComponent();
+            cbShowPassword.Checked = false;
+
+            txtPassword.UseSystemPasswordChar = true;
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
@@ -78,5 +81,24 @@ namespace CRUDMahasiswaADO
         {
 
         }
+
+        private void cbShowPassword_CheckedChanged(object sender, EventArgs e)
+        {
+            if (cbShowPassword.Checked)
+            {
+                txtPassword.UseSystemPasswordChar = false;
+            }
+            else
+            {
+                txtPassword.UseSystemPasswordChar = true;
+            }
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+
     }
 }
