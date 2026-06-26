@@ -21,18 +21,14 @@ Payload SQL Injection berhasil memanipulasi query login sehingga kondisi autenti
 2. Pilih bahasa yang akan digunakan saat proses instalasi, kemudian klik OK
   <img width="354" height="167" alt="Screenshot 2026-06-25 203121" src="https://github.com/user-attachments/assets/31e27b76-07e6-4f0a-aa84-cc45d1082b38" />
 
-3.Tentukan lokasi instalasi aplikasi, kemudian klik Next
-  <img width="594" height="431" alt="image" src="https://github.com/user-attachments/assets/5480b8f6-62fe-4053-b686-a8897b394aa5" />
-
-  
-4. Pilih opsi Create a desktop shortcut apabila ingin membuat shortcut di Desktop (opsional), kemudian klik Next
+3. Pilih opsi Create a desktop shortcut apabila ingin membuat shortcut di Desktop (opsional), kemudian klik Next
    <img width="595" height="456" alt="Screenshot 2026-06-25 203658" src="https://github.com/user-attachments/assets/f5a349de-5b7b-446f-a67d-e21cfa8a6e79" />
    <img width="593" height="461" alt="Screenshot 2026-06-25 203716" src="https://github.com/user-attachments/assets/6dbbaf90-880e-4084-85d7-1b8ac06e0203" />
 
-5. Klik Install untuk memulai proses instalasi aplikasi.
+4. Klik Install untuk memulai proses instalasi aplikasi.
    <img width="589" height="460" alt="Screenshot 2026-06-25 203731" src="https://github.com/user-attachments/assets/e4987523-f6d1-45b2-8e9e-b658dfb8c2ad" />
 
-6. Setelah proses instalasi selesai, klik Finish untuk menutup installer dan menjalankan aplikasi
+5. Setelah proses instalasi selesai, klik Finish untuk menutup installer dan menjalankan aplikasi
    <img width="591" height="460" alt="Screenshot 2026-06-25 203750" src="https://github.com/user-attachments/assets/1176c4fc-b44a-45e3-9dce-5d686d62b7d0" />
 
 
