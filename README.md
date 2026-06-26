@@ -21,6 +21,9 @@ Payload SQL Injection berhasil memanipulasi query login sehingga kondisi autenti
 2. Pilih bahasa yang akan digunakan saat proses instalasi, kemudian klik OK
   <img width="354" height="167" alt="Screenshot 2026-06-25 203121" src="https://github.com/user-attachments/assets/31e27b76-07e6-4f0a-aa84-cc45d1082b38" />
 
+3. Tentukan lokasi instalasi aplikasi, kemudian klik Next
+   <img width="589" height="460" alt="image" src="https://github.com/user-attachments/assets/c53fd552-a3ab-41d2-897e-e12c79268602" />
+
 3. Pilih opsi Create a desktop shortcut apabila ingin membuat shortcut di Desktop (opsional), kemudian klik Next
    <img width="595" height="456" alt="Screenshot 2026-06-25 203658" src="https://github.com/user-attachments/assets/f5a349de-5b7b-446f-a67d-e21cfa8a6e79" />
    <img width="593" height="461" alt="Screenshot 2026-06-25 203716" src="https://github.com/user-attachments/assets/6dbbaf90-880e-4084-85d7-1b8ac06e0203" />
